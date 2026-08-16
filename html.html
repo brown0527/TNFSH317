@@ -123,28 +123,11 @@
         </div>
       </div>
 
-      <!-- 成功燒臘菜單選單 -->
+      <!-- 動態選單：由 JavaScript 根據試算表店家名稱動態渲染 -->
       <div class="form-group">
         <label for="food-item">選擇餐點品項：</label>
         <select id="food-item" required>
-          <option value="">-- 請選擇餐點 --</option>
-          <option value="三寶飯">三寶飯 - $95</option>
-          <option value="烤雞腿飯">烤雞腿飯 - $95</option>
-          <option value="油雞腿飯">油雞腿飯 - $95</option>
-          <option value="鴛鴦雞飯">鴛鴦雞飯 - $95</option>
-          <option value="脆皮燒鴨飯">脆皮燒鴨飯 - $95</option>
-          <option value="脆皮火肉飯">脆皮火肉飯 - $95</option>
-          <option value="蜜汁叉燒飯">蜜汁叉燒飯 - $95</option>
-          <option value="美味香腸飯">美味香腸飯 - $95</option>
-          <option value="火肉香腸飯">火肉香腸飯 - $95</option>
-          <option value="火肉油雞飯">火肉油雞飯 - $95</option>
-          <option value="火肉燒鴨飯">火肉燒鴨飯 - $95</option>
-          <option value="燒鴨叉燒飯">燒鴨叉燒飯 - $95</option>
-          <option value="燒鴨油雞飯">燒鴨油雞飯 - $95</option>
-          <option value="燒鴨香腸飯">燒鴨香腸飯 - $95</option>
-          <option value="叉燒油雞飯">叉燒油雞飯 - $95</option>
-          <option value="叉燒香腸飯">叉燒香腸飯 - $95</option>
-          <option value="白飯">白飯 - $0</option>
+          <option value="">-- 請先載入店家資料 --</option>
         </select>
       </div>
       <button class="submit-btn" id="submit-order-btn">確認訂購並扣款</button>
@@ -184,12 +167,66 @@
     let currentShop = "載入中...";
     let deadlineISO = "";
 
-    const foodPrices = {
-      "三寶飯": 95, "烤雞腿飯": 95, "油雞腿飯": 95, "鴛鴦雞飯": 95, "脆皮燒鴨飯": 95,
-      "脆皮火肉飯": 95, "蜜汁叉燒飯": 95, "美味香腸飯": 95, "火肉香腸飯": 95, "火肉油雞飯": 95,
-      "火肉燒鴨飯": 95, "燒鴨叉燒飯": 95, "燒鴨油雞飯": 95, "燒鴨香腸飯": 95, "叉燒油雞飯": 95,
-      "叉燒香腸飯": 95, "白飯": 0
+    // 🏪 店家菜單資料庫
+    const shopMenus = {
+      "成功燒臘": [
+        { name: "三寶飯", price: 95 },
+        { name: "烤雞腿飯", price: 95 },
+        { name: "油雞腿飯", price: 95 },
+        { name: "鴛鴦雞飯", price: 95 },
+        { name: "脆皮燒鴨飯", price: 95 },
+        { name: "脆皮火肉飯", price: 95 },
+        { name: "蜜汁叉燒飯", price: 95 },
+        { name: "美味香腸飯", price: 95 },
+        { name: "火肉香腸飯", price: 95 },
+        { name: "火肉油雞飯", price: 95 },
+        { name: "火肉燒鴨飯", price: 95 },
+        { name: "燒鴨叉燒飯", price: 95 },
+        { name: "燒鴨油雞飯", price: 95 },
+        { name: "燒鴨香腸飯", price: 95 },
+        { name: "叉燒油雞飯", price: 95 },
+        { name: "叉燒香腸飯", price: 95 },
+        { name: "白飯", price: 0 }
+      ],
+      "勁請享用": [
+        // 雞肉類
+        { name: "舒肥雞胸餐盒", price: 120 },
+        { name: "祖傳雞腿餐盒", price: 120 },
+        { name: "夏日檸檬雞餐盒", price: 125 },
+        { name: "蔥油嫩雞胸餐盒", price: 125 },
+        { name: "醬燒春雞餐盒", price: 130 },
+        { name: "韓式辣雞餐盒", price: 130 },
+        { name: "川味香麻雞餐盒", price: 130 },
+        // 魚肉類
+        { name: "鮮烤鯖魚餐盒", price: 120 },
+        // 豬肉類
+        { name: "泰式打拋豬餐盒", price: 115 },
+        { name: "蒜醬里肌餐盒", price: 115 },
+        { name: "泡菜里肌餐盒", price: 125 },
+        { name: "花雕滷軟骨餐盒", price: 125 },
+        // 牛肉及蔬食類
+        { name: "蔥燒雪花牛餐盒", price: 140 },
+        { name: "泡菜雪花牛餐盒", price: 140 },
+        { name: "照燒杏鮑菇餐盒", price: 105 },
+        // 單點品項
+        { name: "單點-地瓜(4塊)", price: 15 },
+        { name: "單點-全熟蛋", price: 15 },
+        { name: "單點-紫米飯", price: 20 },
+        { name: "單點-時令青菜", price: 35 },
+        // 冷泡茶類
+        { name: "蜜香紅茶", price: 35 },
+        { name: "高山青茶", price: 35 },
+        { name: "桂花烏龍", price: 35 },
+        { name: "玫瑰綠茶", price: 35 },
+        { name: "粉玫瑰花茶", price: 35 },
+        { name: "洋甘菊花茶", price: 35 },
+        { name: "歐薄荷葉茶", price: 35 },
+        { name: "藍莓水果茶", price: 35 }
+      ]
     };
+
+    // 當前有效餐點價格表
+    let activePrices = {};
 
     const loginSection = document.getElementById('login-section');
     const studentSection = document.getElementById('student-section');
@@ -202,7 +239,7 @@
         studentSection.classList.remove('hidden');
         document.getElementById('user-name-display').innerText = currentUser.displayName;
 
-        // 從總記錄讀取 J~L 欄對應的座號與餘額
+        // 從總記錄讀取 J~L 欄對應的座號與餘額，以及 P3 店家
         await loadDataFromGoogleSheet(currentUser.email, currentUser.displayName);
       }).catch((error) => alert("登入失敗: " + error.message));
     });
@@ -223,12 +260,42 @@
           document.getElementById('current-shop-display').innerText = currentShop;
           document.getElementById('current-deadline-display').innerHTML = formatDateTime(deadlineISO);
           document.getElementById('user-balance-display').innerText = currentBalance;
+
+          // 根據讀取到的店家名稱判定並動態產生選單
+          renderMenuByShop(currentShop);
         } else {
           alert("讀取試算表失敗: " + data.message);
         }
       } catch (e) {
         console.error("載入失敗:", e);
         alert("無法讀取試算表資料，請確認 Apps Script 部署設定！");
+      }
+    }
+
+    // 🍱 依據店家名稱動態產生下拉選單
+    function renderMenuByShop(shopName) {
+      const foodSelect = document.getElementById('food-item');
+      foodSelect.innerHTML = '<option value="">-- 請選擇餐點 --</option>';
+      activePrices = {};
+
+      // 自動比對店家名稱是否包含關鍵字
+      const matchedShopKey = Object.keys(shopMenus).find(key => shopName.includes(key));
+
+      if (matchedShopKey && shopMenus[matchedShopKey]) {
+        shopMenus[matchedShopKey].forEach(item => {
+          activePrices[item.name] = item.price;
+          const opt = document.createElement('option');
+          opt.value = item.name;
+          opt.textContent = `${item.name} - $${item.price}`;
+          foodSelect.appendChild(opt);
+        });
+      } else {
+        const opt = document.createElement('option');
+        opt.value = "";
+        opt.disabled = true;
+        opt.selected = true;
+        opt.textContent = `-- 目前店家（${shopName}）尚未開放選單 --`;
+        foodSelect.appendChild(opt);
       }
     }
 
@@ -261,7 +328,7 @@
         return alert("❌ 已超過截止時間，無法訂購！");
       }
 
-      const price = foodPrices[selectedFood];
+      const price = activePrices[selectedFood] !== undefined ? activePrices[selectedFood] : 0;
       if (currentBalance < price) {
         return alert(`❌ 餘額不足 ($${currentBalance})，請找總務繳費儲值！`);
       }
@@ -343,7 +410,7 @@
       if (!confirm("確定要刪除這筆訂單嗎？款項將退回您的帳戶。")) return;
 
       try {
-        await deleteDoc(doc(docSnap => docSnap.id, "orders", orderId));
+        await deleteDoc(doc(db, "orders", orderId));
         currentBalance += orderPrice;
         document.getElementById('user-balance-display').innerText = currentBalance;
 
