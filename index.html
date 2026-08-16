@@ -89,7 +89,7 @@
       height: 20px;
     }
     .divider {
-      margin: 28px 0;
+      margin: 24px 0 18px 0;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -100,15 +100,14 @@
       background-color: #e0e0e0;
       border: none;
     }
-    .logo-box {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .site-logo {
-      max-width: 140px;
-      height: auto;
-      object-fit: contain;
+
+    /* 分隔線下的雙語班標籤文字 */
+    .bilingual-tag {
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: #8D6E63;
+      text-transform: uppercase;
     }
 
     /* 表單與控制項 */
@@ -182,9 +181,9 @@
       <span class="divider-line"></span>
     </div>
 
-    <div class="logo-box">
-      <!-- 若圖片無法顯示，請將圖片重命名為 login-photo.png（不要留空格） -->
-      <img src="loginphoto.png" alt="系統 Logo" class="site-logo">
+    <!-- 拿掉圖片，替換為文字 -->
+    <div class="bilingual-tag">
+      BILINGUAL CLASS
     </div>
   </div>
 
