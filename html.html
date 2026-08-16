@@ -125,13 +125,21 @@
         <label>本日合作店家：<span id="current-shop-display" style="color:#D32F2F;">載入中...</span></label>
         <label>訂餐截止時間：<span id="current-deadline-display" style="color:#D32F2F;">載入中...</span></label>
       </div>
+
+      <!-- 座號輸入框 -->
+      <div class="form-group">
+        <label for="seat-number">請輸入座號：</label>
+        <input type="number" id="seat-number" placeholder="例如：05" min="1" max="60" required>
+      </div>
+
       <div class="form-group">
         <label for="food-item">選擇餐點品項：</label>
         <select id="food-item" required>
           <option value="">-- 請選擇餐點 --</option>
-          <option value="排骨飯">香酥排骨飯 - $80</option>
-          <option value="雞腿飯">滷雞腿飯 - $90</option>
-          <option value="素食餐">健康素食便當 - $75</option>
+          <option value="火肉燒鴨">火肉燒鴨 - $100</option>
+          <option value="脆皮火肉">脆皮火肉 - $100</option>
+          <option value="加飯">加飯 - $0</option>
+          <option value="香酥排骨飯">香酥排骨飯 - $80</option>
         </select>
       </div>
       <button class="submit-btn" id="submit-order-btn">確認訂購並扣款</button>
@@ -162,20 +170,20 @@
       <div style="max-height: 200px; overflow-y: auto;">
         <table class="admin-table">
           <thead>
-            <tr><th>姓名</th><th>餐點</th><th>金額</th></tr>
+            <tr><th>座號</th><th>姓名</th><th>餐點</th><th>金額</th></tr>
           </thead>
           <tbody id="admin-order-tbody">
-            <tr><td colspan="3">載入中...</td></tr>
+            <tr><td colspan="4">載入中...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- 頁籤 B：系統設定 (含日期+時間) -->
+    <!-- 頁籤 B：系統設定 -->
     <div id="admin-settings-container" class="hidden">
       <div class="form-group">
         <label>合作店家名稱：</label>
-        <input type="text" id="setting-shop-name" placeholder="例如：正忠排骨飯">
+        <input type="text" id="setting-shop-name" placeholder="例如：成功燒臘">
       </div>
       <div class="form-group">
         <label>訂餐截止日期與時間：</label>
@@ -203,7 +211,7 @@
     import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc, deleteDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
-    // 🔴 你的 Firebase 專屬金鑰
+    // 🔴 1. Firebase 專屬設定
     const firebaseConfig = {
       apiKey: "AIzaSyBeeHDa90rYjlwcgLodkq6EZSfPuqjlhgA",
       authDomain: "tnfsh317-bdb2f.firebaseapp.com",
@@ -213,11 +221,14 @@
       appId: "1:423622761609:web:4fa769feb5df297d9c7a58"
     };
 
-    // 🔴 管理員 Email 名單
+    // 🔴 2. 管理員 Email 名單
     const adminEmails = [
       "your-email@gmail.com", 
       "brown0527@gmail.com"
     ];
+
+    // 🔴 3. Google Apps Script Web App 網址 (換成你自己的 GAS 部署網址)
+    const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbymzDwvUT4AgW45VCyt0buZT3yUhwR75vpif_BGZ0SRFdHOlR_h-do9xk59U_VIF9D6/exec";
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -226,7 +237,7 @@
 
     let currentUser = null;
     let currentBalance = 0;
-    const foodPrices = { "排骨飯": 80, "雞腿飯": 90, "素食餐": 75 };
+    const foodPrices = { "火肉燒鴨": 100, "脆皮火肉": 100, "加飯": 0, "香酥排骨飯": 80 };
 
     const loginSection = document.getElementById('login-section');
     const studentSection = document.getElementById('student-section');
@@ -266,7 +277,6 @@
       document.getElementById('user-balance-display').innerText = currentBalance;
     }
 
-    // 格式化顯示日期時間
     function formatDateTime(dateTimeStr) {
       if (!dateTimeStr) return "未指定";
       const d = new Date(dateTimeStr);
@@ -283,7 +293,6 @@
       }
     }
 
-    // ⏱️ 比對目前時間與截止日期時間
     async function isPastDeadline() {
       const sysRef = doc(db, "system", "dailyConfig");
       const sysSnap = await getDoc(sysRef);
@@ -292,43 +301,67 @@
         if (deadlineISO) {
           const now = new Date();
           const deadline = new Date(deadlineISO);
-          return now > deadline; // 如果目前時間大於截止時間，回傳 true
+          return now > deadline;
         }
       }
       return false;
     }
 
-    // 新增訂單
+    // 新增訂單並同時同步至 Google Sheets
     document.getElementById('submit-order-btn').addEventListener('click', async () => {
       const selectedFood = document.getElementById('food-item').value;
+      const seatNumber = document.getElementById('seat-number').value.trim();
+      const currentShop = document.getElementById('current-shop-display').innerText;
+
+      if (!seatNumber) return alert("請輸入座號！");
       if (!selectedFood) return alert("請選擇餐點！");
 
       if (await isPastDeadline()) {
-        return alert("❌ 已超過截止日期時間，無法新增訂單！");
+        return alert("❌ 已超過截止日期時間，無法新增訂購！");
       }
 
       const price = foodPrices[selectedFood];
       if (currentBalance < price) return alert(`❌ 餘額不足 ($${currentBalance})，請找總務股長繳費！`);
 
       try {
+        // 1. 寫入 Firebase
         await addDoc(collection(db, "orders"), {
           studentEmail: currentUser.email,
           studentName: currentUser.displayName,
+          seatNumber: seatNumber,
+          shopName: currentShop,
           foodItem: selectedFood,
           price: price,
           orderTime: serverTimestamp()
         });
 
+        // 2. 扣款
         const newBalance = currentBalance - price;
         await updateDoc(doc(db, "users", currentUser.email), { balance: newBalance });
         currentBalance = newBalance;
         document.getElementById('user-balance-display').innerText = currentBalance;
-        
-        alert("✅ 訂購成功！");
-      } catch (e) { console.error(e); }
+
+        // 3. 🚀 發送至 Google Sheets
+        fetch(GOOGLE_SHEET_WEB_APP_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            shopName: currentShop,
+            seatNumber: seatNumber,
+            studentName: currentUser.displayName,
+            foodItem: selectedFood,
+            price: price
+          })
+        });
+
+        alert("✅ 訂購成功！同步記錄至 Google 試算表。");
+      } catch (e) {
+        console.error(e);
+        alert("訂購失敗: " + e.message);
+      }
     });
 
-    // 載入學生個人訂單列表
     async function loadStudentHistory() {
       const historyList = document.getElementById('history-list');
       historyList.innerHTML = "載入中...";
@@ -348,8 +381,8 @@
         html += `
           <div class="order-card">
             <div class="order-info">
-              <div class="order-title">${order.foodItem}</div>
-              <div>金額：$${order.price}</div>
+              <div class="order-title">${order.foodItem} (${order.shopName || ''})</div>
+              <div>金額：$${order.price} | 座號：${order.seatNumber || '無'}</div>
             </div>
             <button class="btn-delete" onclick="window.deleteOrder('${orderId}', ${order.price})">刪除訂單並退款</button>
           </div>
@@ -358,33 +391,27 @@
       historyList.innerHTML = html;
     }
 
-    // 🗑️ 刪除訂單並退款功能
+    // 🗑️ 刪除訂單並退款
     window.deleteOrder = async function(orderId, orderPrice) {
       if (await isPastDeadline()) {
         return alert("❌ 已超過截止日期時間，訂單已送出給店家，無法刪除退款！");
       }
 
-      if (!confirm("確定要刪除這筆訂單嗎？款項將會立即全額退回您的帳戶。")) return;
+      if (!confirm("確定要刪除這筆訂單嗎？款項將會退回您的帳戶。")) return;
 
       try {
-        // 1. 從 Firebase 刪除該筆訂單
         await deleteDoc(doc(db, "orders", orderId));
-
-        // 2. 將金額退回該學生的帳戶餘額
         const newBalance = currentBalance + orderPrice;
         await updateDoc(doc(db, "users", currentUser.email), { balance: newBalance });
         currentBalance = newBalance;
         document.getElementById('user-balance-display').innerText = currentBalance;
 
         alert("✅ 訂單已成功刪除，金額已全額退回您的帳戶！");
-        loadStudentHistory(); // 重新整理列表
+        loadStudentHistory();
       } catch (e) { alert("刪除失敗: " + e.message); }
     };
 
-    // 學生頁籤切換
-    document.getElementById('tab-order').addEventListener('click', (e) => {
-      switchStudentTab(e, 'order-form-container');
-    });
+    document.getElementById('tab-order').addEventListener('click', (e) => switchStudentTab(e, 'order-form-container'));
     document.getElementById('tab-history').addEventListener('click', (e) => {
       switchStudentTab(e, 'history-container');
       loadStudentHistory();
@@ -411,7 +438,7 @@
         const item = doc.data();
         counts[item.foodItem] = (counts[item.foodItem] || 0) + 1;
         totalMoney += item.price || 0;
-        tbodyHtml += `<tr><td>${item.studentName}</td><td>${item.foodItem}</td><td>$${item.price}</td></tr>`;
+        tbodyHtml += `<tr><td>${item.seatNumber || '-'}</td><td>${item.studentName}</td><td>${item.foodItem}</td><td>$${item.price}</td></tr>`;
       });
 
       let summaryHtml = "";
@@ -421,17 +448,14 @@
       summaryHtml += `<hr><div class="summary-item"><span>預計總金額：</span><strong style="color:#D32F2F;">$${totalMoney} 元</strong></div>`;
 
       document.getElementById('summary-content').innerHTML = summaryHtml || "尚無訂單";
-      document.getElementById('admin-order-tbody').innerHTML = tbodyHtml || "<tr><td colspan='3'>無資料</td></tr>";
+      document.getElementById('admin-order-tbody').innerHTML = tbodyHtml || "<tr><td colspan='4'>無資料</td></tr>";
     }
 
-    // 儲存設定 (店家與截止日期時間)
     document.getElementById('save-settings-btn').addEventListener('click', async () => {
       const shopName = document.getElementById('setting-shop-name').value;
       const deadlineISO = document.getElementById('setting-deadline-datetime').value;
 
-      if (!shopName || !deadlineISO) {
-        return alert("請填寫完整的店家名稱與截止日期時間！");
-      }
+      if (!shopName || !deadlineISO) return alert("請填寫完整的店家名稱與截止日期時間！");
 
       await setDoc(doc(db, "system", "dailyConfig"), {
         shopName: shopName,
@@ -440,7 +464,6 @@
       alert("✅ 系統設定已成功更新！");
     });
 
-    // 學生儲值
     document.getElementById('submit-deposit-btn').addEventListener('click', async () => {
       const email = document.getElementById('deposit-user-email').value.trim();
       const amount = Number(document.getElementById('deposit-amount').value);
