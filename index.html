@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TNFSH317 班級訂餐系統</title>
+
+  <!-- 載入 Google 書寫體字型 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+
   <style>
     /* 基礎樣式 */
     body {
@@ -47,6 +53,17 @@
       font-size: 1.25rem;
       color: #333333;
     }
+    
+    /* TNFSH317 書寫體專用樣式 */
+    .script-text {
+      font-family: 'Dancing Script', 'Brush Script MT', cursive;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #3E2723;
+      line-height: 1.1;
+      display: inline-block;
+    }
+
     .btn-google {
       width: 100%;
       display: flex;
@@ -150,12 +167,12 @@
 </head>
 <body>
 
- <!-- 1. 登入區域卡片 (補上 id="login-section") -->
-<div class="login-card" id="login-section">
-  <h2 class="login-title">
-    <span class="script-text">TNFSH317</span><br>Welcome
-  </h2>
-    <!-- 補上 id="login-btn"，移除無效的 onclick -->
+  <!-- 1. 登入區域卡片 -->
+  <div class="login-card" id="login-section">
+    <h2 class="login-title">
+      <span class="script-text">TNFSH317</span><br>Welcome
+    </h2>
+
     <button class="btn-google" id="login-btn">
       <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="google-icon">
       使用 Google 帳號登入
@@ -166,8 +183,8 @@
     </div>
 
     <div class="logo-box">
-      <!-- ⚠️ 請記得將 YOUR_LOGO_URL.png 替換為實際的圖片檔名或連結 -->
-      <img src="login photo.png" alt="系統 Logo" class="site-logo">
+      <!-- 若圖片無法顯示，請將圖片重命名為 login-photo.png（不要留空格） -->
+      <img src="login%20photo.png" alt="系統 Logo" class="site-logo">
     </div>
   </div>
 
@@ -278,8 +295,7 @@
         { name: "單點-地瓜(4塊)", price: 15 },
         { name: "單點-全熟蛋", price: 15 },
         { name: "單點-紫米飯", price: 20 },
-        { name: "單點-時令青菜", price: 35 },
-        
+        { name: "單點-時令青菜", price: 35 }
       ]
     };
 
