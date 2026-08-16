@@ -102,7 +102,7 @@
   <!-- 2. 學生點餐介面 -->
   <div class="card hidden" id="student-section">
     <div class="header-bar">
-      <div class="header-name" id="user-name-display">學生名稱</div>
+      <div class="header-name"><span id="user-seat-display">--</span>號 <span id="user-name-display">學生名稱</span></div>
       <div class="header-balance">餘額: $<span id="user-balance-display">載入中...</span></div>
     </div>
 
@@ -112,7 +112,6 @@
     </div>
     
     <div id="order-form-container">
-      <!-- 店家與換行時間資訊區 -->
       <div class="info-box">
         <div style="margin-bottom: 8px;">
           <strong style="color:#3E2723;">本日合作店家：</strong>
@@ -124,19 +123,28 @@
         </div>
       </div>
 
-      <div class="form-group">
-        <label for="seat-number">請輸入座號：</label>
-        <input type="number" id="seat-number" placeholder="例如：05" min="1" max="60" required>
-      </div>
-
+      <!-- 成功燒臘菜單選單 -->
       <div class="form-group">
         <label for="food-item">選擇餐點品項：</label>
         <select id="food-item" required>
           <option value="">-- 請選擇餐點 --</option>
-          <option value="火肉燒鴨">火肉燒鴨 - $100</option>
-          <option value="脆皮火肉">脆皮火肉 - $100</option>
-          <option value="加飯">加飯 - $0</option>
-          <option value="香酥排骨飯">香酥排骨飯 - $80</option>
+          <option value="三寶飯">三寶飯 - $95</option>
+          <option value="烤雞腿飯">烤雞腿飯 - $95</option>
+          <option value="油雞腿飯">油雞腿飯 - $95</option>
+          <option value="鴛鴦雞飯">鴛鴦雞飯 - $95</option>
+          <option value="脆皮燒鴨飯">脆皮燒鴨飯 - $95</option>
+          <option value="脆皮火肉飯">脆皮火肉飯 - $95</option>
+          <option value="蜜汁叉燒飯">蜜汁叉燒飯 - $95</option>
+          <option value="美味香腸飯">美味香腸飯 - $95</option>
+          <option value="火肉香腸飯">火肉香腸飯 - $95</option>
+          <option value="火肉油雞飯">火肉油雞飯 - $95</option>
+          <option value="火肉燒鴨飯">火肉燒鴨飯 - $95</option>
+          <option value="燒鴨叉燒飯">燒鴨叉燒飯 - $95</option>
+          <option value="燒鴨油雞飯">燒鴨油雞飯 - $95</option>
+          <option value="燒鴨香腸飯">燒鴨香腸飯 - $95</option>
+          <option value="叉燒油雞飯">叉燒油雞飯 - $95</option>
+          <option value="叉燒香腸飯">叉燒香腸飯 - $95</option>
+          <option value="白飯">白飯 - $0</option>
         </select>
       </div>
       <button class="submit-btn" id="submit-order-btn">確認訂購並扣款</button>
@@ -163,7 +171,7 @@
     };
 
     // 🔴 2. Google Apps Script 部署網址
-    const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/你的APPS_SCRIPT部署ID/exec";
+    const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzDqN6bFzpUvael2llNgsMFFOzWF88XH8Lxd6i9GtfN_cEUGPA_tP5PdtVgyZ0Nh5N3/exec";
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -172,10 +180,16 @@
 
     let currentUser = null;
     let currentBalance = 0;
+    let currentSeatNumber = "";
     let currentShop = "載入中...";
     let deadlineISO = "";
 
-    const foodPrices = { "火肉燒鴨": 100, "脆皮火肉": 100, "加飯": 0, "香酥排骨飯": 80 };
+    const foodPrices = {
+      "三寶飯": 95, "烤雞腿飯": 95, "油雞腿飯": 95, "鴛鴦雞飯": 95, "脆皮燒鴨飯": 95,
+      "脆皮火肉飯": 95, "蜜汁叉燒飯": 95, "美味香腸飯": 95, "火肉香腸飯": 95, "火肉油雞飯": 95,
+      "火肉燒鴨飯": 95, "燒鴨叉燒飯": 95, "燒鴨油雞飯": 95, "燒鴨香腸飯": 95, "叉燒油雞飯": 95,
+      "叉燒香腸飯": 95, "白飯": 0
+    };
 
     const loginSection = document.getElementById('login-section');
     const studentSection = document.getElementById('student-section');
@@ -188,23 +202,25 @@
         studentSection.classList.remove('hidden');
         document.getElementById('user-name-display').innerText = currentUser.displayName;
 
-        await loadDataFromGoogleSheet(currentUser.email);
+        // 從總記錄讀取 J~L 欄對應的座號與餘額
+        await loadDataFromGoogleSheet(currentUser.email, currentUser.displayName);
       }).catch((error) => alert("登入失敗: " + error.message));
     });
 
     // 從 Google 試算表讀取資料
-    async function loadDataFromGoogleSheet(email) {
+    async function loadDataFromGoogleSheet(email, name) {
       try {
-        const res = await fetch(`${GOOGLE_SHEET_WEB_APP_URL}?email=${encodeURIComponent(email)}`);
+        const res = await fetch(`${GOOGLE_SHEET_WEB_APP_URL}?email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`);
         const data = await res.json();
 
         if (data.status === "success") {
           currentShop = data.shopName || "未指定";
           deadlineISO = data.deadlineISO || "";
           currentBalance = data.balance || 0;
+          currentSeatNumber = data.seatNumber || "無";
 
+          document.getElementById('user-seat-display').innerText = currentSeatNumber;
           document.getElementById('current-shop-display').innerText = currentShop;
-          // 使用 innerHTML 讓換行標籤生效
           document.getElementById('current-deadline-display').innerHTML = formatDateTime(deadlineISO);
           document.getElementById('user-balance-display').innerText = currentBalance;
         } else {
@@ -216,7 +232,6 @@
       }
     }
 
-    // 📅 格式化日期時間：包含月/日 (週幾) 並分兩行 (換行)
     function formatDateTime(dateTimeStr) {
       if (!dateTimeStr) return "未指定";
       const d = new Date(dateTimeStr);
@@ -226,8 +241,6 @@
       const datePart = `${d.getMonth() + 1}/${d.getDate()} (${weekDays[d.getDay()]})`;
       const timePart = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 
-      // 第一行: 8/16 (日)
-      // 第二行: 12:00
       return `${datePart}<br>${timePart}`;
     }
 
@@ -241,9 +254,7 @@
     // 新增訂單
     document.getElementById('submit-order-btn').addEventListener('click', async () => {
       const selectedFood = document.getElementById('food-item').value;
-      const seatNumber = document.getElementById('seat-number').value.trim();
 
-      if (!seatNumber) return alert("請輸入座號！");
       if (!selectedFood) return alert("請選擇餐點！");
 
       if (isPastDeadline()) {
@@ -260,7 +271,7 @@
         await addDoc(collection(db, "orders"), {
           studentEmail: currentUser.email,
           studentName: currentUser.displayName,
-          seatNumber: seatNumber,
+          seatNumber: currentSeatNumber,
           shopName: currentShop,
           foodItem: selectedFood,
           price: price,
@@ -279,7 +290,7 @@
           body: JSON.stringify({
             shopName: currentShop,
             studentEmail: currentUser.email,
-            seatNumber: seatNumber,
+            seatNumber: currentSeatNumber,
             studentName: currentUser.displayName,
             foodItem: selectedFood,
             price: price
@@ -332,7 +343,7 @@
       if (!confirm("確定要刪除這筆訂單嗎？款項將退回您的帳戶。")) return;
 
       try {
-        await deleteDoc(doc(db, "orders", orderId));
+        await deleteDoc(doc(docSnap => docSnap.id, "orders", orderId));
         currentBalance += orderPrice;
         document.getElementById('user-balance-display').innerText = currentBalance;
 
