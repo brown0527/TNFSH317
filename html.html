@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TNFSH317 班級訂餐系統</title>
+  <style>
+    /* 全局背景與卡片基礎設定 */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #FCF8F2 0%, #EADDCA 50%, #C9A96E 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background-color: #FFFEFC;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(100, 70, 30, 0.15);
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+    }
+    h1 { color: #3E2723; font-size: 24px; margin-bottom: 10px; line-height: 1.4; letter-spacing: 1px; }
+    p { color: #8D6E63; margin-bottom: 20px; font-size: 14px; }
+    .hidden { display: none !important; }
+
+    /* Google 登入按鈕 */
+    .google-btn {
+      background-color: #4285F4; color: white; border: none; padding: 12px 20px;
+      border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer;
+      width: 100%; display: flex; justify-content: center; align-items: center; gap: 12px;
+      transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3); 
+    }
+    .google-btn:hover { background-color: #357ae8; transform: translateY(-2px); }
+    .google-icon-mock { background-color: white; color: #4285F4; border-radius: 50%; width: 24px; height: 24px; display: inline-block; line-height: 24px; font-weight: 900; }
+
+    /* 表單與日曆元件 */
+    .form-group { margin-bottom: 20px; text-align: left; }
+    .form-group label { display: block; margin-bottom: 8px; color: #3E2723; font-weight: bold; font-size: 14px; }
+    .form-group select {
+      width: 100%; padding: 12px; border: 1px solid #C9A96E; border-radius: 8px;
+      box-sizing: border-box; background-color: #FCF8F2; color: #3E2723; font-size: 15px;
+    }
+    
+    .date-slider { display: flex; overflow-x: auto; gap: 10px; padding: 5px 0 10px 0; scrollbar-width: thin; }
+    .date-slider::-webkit-scrollbar { height: 6px; }
+    .date-slider::-webkit-scrollbar-thumb { background: #C9A96E; border-radius: 10px; }
+    .date-card {
+      min-width: 60px; padding: 10px 5px; border-radius: 10px; border: 2px solid #E0E0E0;
+      background-color: #F5F5F5; color: #9E9E9E; text-align: center; cursor: not-allowed; user-select: none;
+    }
+    .date-card .day { font-size: 12px; margin-bottom: 5px; }
+    .date-card .date-num { font-size: 18px; font-weight: bold; }
+    .date-card.available { background-color: #E1F5FE; border-color: #81D4FA; color: #0288D1; cursor: pointer; }
+    .date-card.available.selected { background-color: #0288D1; border-color: #0288D1; color: white; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(2, 136, 209, 0.3); }
+    .submit-btn {
+      background-color: #3E2723; color: #EADDCA; border: none; padding: 14px;
+      border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; transition: background-color 0.3s;
+    }
+    .submit-btn:hover { background-color: #5D4037; }
+
+    /* ✨ 新增：頂部資訊列 (包含餘額) */
+    .header-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      background-color: #FCF8F2; padding: 10px 15px; border-radius: 8px;
+      margin-bottom: 20px; border: 1px solid #EADDCA;
+    }
+    .header-name { font-weight: bold; color: #3E2723; font-size: 15px; }
+    .header-balance { font-weight: bold; color: #D32F2F; font-size: 15px; }
+
+    /* ✨ 新增：切換標籤頁 */
+    .tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid #EADDCA; }
+    .tab-btn {
+      flex: 1; padding: 10px; background: none; border: none; cursor: pointer;
+      font-size: 15px; font-weight: bold; color: #8D6E63; transition: 0.3s;
+    }
+    .tab-btn.active { color: #3E2723; border-bottom: 3px solid #C9A96E; }
+
+    /* ✨ 新增：歷史紀錄列表 */
+    .history-list { text-align: left; max-height: 250px; overflow-y: auto; padding-right: 5px; }
+    .history-item {
+      background: #FCF8F2; padding: 12px; border-radius: 8px; margin-bottom: 10px;
+      border: 1px solid #EADDCA; display: flex; justify-content: space-between; align-items: center;
+    }
+    .history-date { font-size: 12px; color: #8D6E63; margin-bottom: 4px; }
+    .history-food { font-weight: bold; color: #3E2723; font-size: 15px; }
+    .history-price { font-weight: bold; color: #D32F2F; }
+    .no-data { text-align: center; color: #8D6E63; padding: 20px 0; font-size: 14px; }
+  </style>
+</head>
+<body>
+
+  <!-- 畫面一：登入卡片 -->
+  <div class="card" id="login-section">
+    <h1>TNFSH317<br>班級午餐訂購系統</h1>
+    <p>請使用學校信箱 (Google 帳號) 登入以繼續</p>
+    <button class="google-btn" id="login-btn">
+      <span class="google-icon-mock">G</span> 使用 Google 帳號登入
+    </button>
+  </div>
+
+  <!-- 畫面二：主系統 (預設隱藏) -->
+  <div class="card hidden" id="main-section">
+    
+    <!-- 頂部資訊列 (顯示姓名與餘額) -->
+    <div class="header-bar">
+      <div class="header-name" id="user-name-display">某某同學</div>
+      <div class="header-balance">餘額: $<span id="user-balance-display">0</span></div>
+    </div>
+
+    <!-- 標籤頁切換 -->
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-order">🍱 我要點餐</button>
+      <button class="tab-btn" id="tab-history">📜 歷史紀錄</button>
+    </div>
+    
+    <!-- 區塊 A：點餐表單 -->
+    <div id="order-form-container">
+      <div class="form-group">
+        <label>選擇訂購日期：</label>
+        <div class="date-slider" id="date-slider"></div>
+        <input type="hidden" id="order-date" required>
+      </div>
+
+      <div class="form-group">
+        <label for="food-item">選擇餐點品項：</label>
+        <select id="food-item" required>
+          <option value="">-- 請選擇餐點 --</option>
+          <option value="排骨飯">香酥排骨飯 - $80</option>
+          <option value="雞腿飯">滷雞腿飯 - $90</option>
+          <option value="素食餐">健康素食便當 - $75</option>
+        </select>
+      </div>
+
+      <button class="submit-btn" id="submit-order-btn">確認訂購並扣款</button>
+    </div>
+
+    <!-- 區塊 B：歷史紀錄 (預設隱藏) -->
+    <div id="history-container" class="hidden">
+      <div class="history-list" id="history-list">
+        <div class="no-data">載入中...</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module">
+    // 💡 引入 Firebase 需要的新套件 (doc, getDoc, setDoc, updateDoc, query, where, getDocs)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+    // 🔴 請替換成你的 Firebase 金鑰
+    const firebaseConfig = {
+      apiKey: "AIzaSyBeeHDa90rYjlwcgLodkq6EZSfPuqjlhgA",
+      authDomain: "tnfsh317-bdb2f.firebaseapp.com",
+      projectId: "tnfsh317-bdb2f",
+      storageBucket: "tnfsh317-bdb2f.firebasestorage.app",
+      messagingSenderId: "423622761609",
+      appId: "1:423622761609:web:4fa769feb5df297d9c7a58"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    const db = getFirestore(app);
+
+    // DOM 元素
+    const loginSection = document.getElementById('login-section');
+    const mainSection = document.getElementById('main-section');
+    const loginBtn = document.getElementById('login-btn');
+    const nameDisplay = document.getElementById('user-name-display');
+    const balanceDisplay = document.getElementById('user-balance-display');
+    
+    // 表單與紀錄元素
+    const tabOrder = document.getElementById('tab-order');
+    const tabHistory = document.getElementById('tab-history');
+    const orderFormContainer = document.getElementById('order-form-container');
+    const historyContainer = document.getElementById('history-container');
+    const historyList = document.getElementById('history-list');
+    
+    const submitOrderBtn = document.getElementById('submit-order-btn');
+    const dateSlider = document.getElementById('date-slider');
+    const hiddenDateInput = document.getElementById('order-date');
+    const foodSelect = document.getElementById('food-item');
+
+    let currentUser = null;
+    let currentBalance = 0;
+
+    // 💰 餐點價格對照表 (讓程式知道要扣多少錢)
+    const foodPrices = {
+      "排骨飯": 80,
+      "雞腿飯": 90,
+      "素食餐": 75
+    };
+
+    // ==========================================
+    // 📅 產生滑動日曆 (維持原本邏輯)
+    // ==========================================
+    const availableDates = ["2026-08-17", "2026-08-18", "2026-08-19", "2026-08-20", "2026-08-21", "2026-08-24"];
+    let today = new Date();
+    const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+    for (let i = 0; i < 14; i++) {
+      let d = new Date(); d.setDate(today.getDate() + i);
+      let dateString = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      let card = document.createElement('div'); card.className = 'date-card';
+      card.innerHTML = `<div class="day">週${weekdays[d.getDay()]}</div><div class="date-num">${d.getDate()}</div>`;
+      if (availableDates.includes(dateString)) {
+        card.classList.add('available');
+        card.addEventListener('click', () => {
+          document.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected'); hiddenDateInput.value = dateString;
+        });
+      }
+      dateSlider.appendChild(card);
+    }
+
+    // ==========================================
+    // 👤 登入與錢包初始化系統
+    // ==========================================
+    loginBtn.addEventListener('click', () => {
+      signInWithPopup(auth, provider).then(async (result) => {
+        currentUser = result.user;
+        nameDisplay.innerText = currentUser.displayName;
+        
+        // 【重要】查詢使用者的錢包資料
+        // 我們用同學的 email 作為資料庫裡的專屬文件 ID
+        const userRef = doc(db, "users", currentUser.email);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+          // 如果錢包已經存在，抓取目前的餘額
+          currentBalance = userSnap.data().balance;
+        } else {
+          // 如果是第一次登入(沒有錢包)，送他 500 元測試金並寫入資料庫
+          currentBalance = 500;
+          await setDoc(userRef, {
+            name: currentUser.displayName,
+            email: currentUser.email,
+            balance: 500
+          });
+        }
+        
+        // 更新畫面的餘額顯示
+        balanceDisplay.innerText = currentBalance;
+        
+        // 切換畫面
+        loginSection.classList.add('hidden');
+        mainSection.classList.remove('hidden');
+      }).catch((error) => console.error("登入失敗", error));
+    });
+
+    // ==========================================
+    // 📝 訂餐與扣款邏輯
+    // ==========================================
+    submitOrderBtn.addEventListener('click', async () => {
+      const selectedDate = hiddenDateInput.value;
+      const selectedFood = foodSelect.value;
+
+      if (!selectedDate || selectedFood === "") {
+        alert("請完整選擇日期和餐點喔！"); return;
+      }
+
+      const price = foodPrices[selectedFood];
+
+      // 檢查餘額夠不夠
+      if (currentBalance < price) {
+        alert(`❌ 餘額不足！\n此餐點需要 $${price}，但你的餘額只剩 $${currentBalance}。`);
+        return;
+      }
+      
+      submitOrderBtn.innerText = "⏳ 扣款與送出中...";
+      submitOrderBtn.disabled = true;
+
+      try {
+        // 1. 新增訂單紀錄到 "orders" 集合
+        await addDoc(collection(db, "orders"), {
+          studentEmail: currentUser.email,
+          studentName: currentUser.displayName,
+          orderDate: selectedDate,
+          foodItem: selectedFood,
+          price: price,
+          orderTime: serverTimestamp()
+        });
+
+        // 2. 更新 (扣除) 餘額到 "users" 集合
+        const newBalance = currentBalance - price;
+        const userRef = doc(db, "users", currentUser.email);
+        await updateDoc(userRef, { balance: newBalance });
+
+        // 3. 更新本地變數與畫面
+        currentBalance = newBalance;
+        balanceDisplay.innerText = currentBalance;
+
+        alert(`✅ 訂購成功！\n已扣款 $${price}，剩餘餘額 $${currentBalance}。`);
+        
+      } catch (error) {
+        console.error("寫入資料庫失敗: ", error);
+        alert("發生錯誤，請稍後再試！");
+      } finally {
+        submitOrderBtn.innerText = "確認訂購並扣款";
+        submitOrderBtn.disabled = false;
+      }
+    });
+
+    // ==========================================
+    // 🔍 切換標籤與查詢歷史紀錄
+    // ==========================================
+    tabOrder.addEventListener('click', () => {
+      tabOrder.classList.add('active'); tabHistory.classList.remove('active');
+      orderFormContainer.classList.remove('hidden'); historyContainer.classList.add('hidden');
+    });
+
+    tabHistory.addEventListener('click', async () => {
+      tabHistory.classList.add('active'); tabOrder.classList.remove('active');
+      historyContainer.classList.remove('hidden'); orderFormContainer.classList.add('hidden');
+      
+      historyList.innerHTML = '<div class="no-data">⏳ 正在查詢你的雲端訂單...</div>';
+
+      try {
+        // 詢問資料庫：「給我所有 studentEmail 等於目前登入者的訂單」
+        const q = query(
+          collection(db, "orders"), 
+          where("studentEmail", "==", currentUser.email)
+        );
+        
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) {
+          historyList.innerHTML = '<div class="no-data">你還沒有任何訂餐紀錄喔！</div>';
+          return;
+        }
+
+        historyList.innerHTML = ''; // 清空載入中文字
+        
+        // 把抓到的訂單一筆一筆畫成卡片
+        querySnapshot.forEach((doc) => {
+          const order = doc.data();
+          const itemHtml = `
+            <div class="history-item">
+              <div>
+                <div class="history-date">📅 取餐日：${order.orderDate}</div>
+                <div class="history-food">${order.foodItem}</div>
+              </div>
+              <div class="history-price">-$${order.price}</div>
+            </div>
+          `;
+          historyList.innerHTML += itemHtml;
+        });
+      } catch (error) {
+        console.error("讀取歷史紀錄失敗: ", error);
+        historyList.innerHTML = '<div class="no-data">讀取失敗，請重新整理頁面。</div>';
+      }
+    });
+  </script>
+
+</body>
+</html>
