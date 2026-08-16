@@ -29,7 +29,7 @@
       border-radius: 12px;
       box-shadow: 0 10px 30px rgba(100, 70, 30, 0.15);
       width: 100%;
-      max-width: 450px;
+      max-width: 480px;
       text-align: center;
       box-sizing: border-box;
     }
@@ -150,17 +150,36 @@
       line-height: 1.5;
     }
 
-    /* 歷史訂單卡片 */
-    .order-card {
-      background-color: #FCF8F2; border: 1px solid #EADDCA; border-radius: 8px;
-      padding: 12px; margin-bottom: 10px; text-align: left; font-size: 13px;
-      display: flex; justify-content: space-between; align-items: center;
+    /* 歷史訂單表格樣式 (支援水平滑動) */
+    .history-table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 10px;
+      border: 1px solid #EADDCA;
+      border-radius: 8px;
     }
-    .order-info { color: #3E2723; }
-    .order-title { font-weight: bold; font-size: 14px; color: #3E2723; }
-    .btn-delete {
-      padding: 6px 12px; border-radius: 4px; border: none; font-size: 12px;
-      cursor: pointer; font-weight: bold; background-color: #D32F2F; color: white;
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .history-table th, .history-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #EADDCA;
+      border-right: 1px solid #F0E6D8;
+    }
+    .history-table th {
+      background-color: #3E2723;
+      color: #EADDCA;
+      font-weight: bold;
+    }
+    .history-table tr:nth-child(even) {
+      background-color: #FCF8F2;
+    }
+    .history-table tr:hover {
+      background-color: #F5EBE0;
     }
   </style>
 </head>
@@ -181,7 +200,6 @@
       <span class="divider-line"></span>
     </div>
 
-    <!-- 拿掉圖片，替換為文字 -->
     <div class="bilingual-tag">
       BILINGUAL CLASS
     </div>
@@ -228,7 +246,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, serverTimestamp, doc, deleteDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
     // 🔴 1. Firebase 設定
     const firebaseConfig = {
@@ -395,9 +413,6 @@
       }
 
       const price = activePrices[selectedFood] !== undefined ? activePrices[selectedFood] : 0;
-      if (currentBalance < price) {
-        return alert(`❌ 餘額不足 ($${currentBalance})，請找總務繳費儲值！`);
-      }
 
       try {
         await addDoc(collection(db, "orders"), {
@@ -427,58 +442,70 @@
           })
         });
 
-        alert("✅ 訂購成功！已記錄至 Google 試算表。");
+        alert("✅ 訂購成功！請記得繳費~");
       } catch (e) {
         console.error(e);
         alert("訂購失敗: " + e.message);
       }
     });
 
+    // 📜 讀取 Google 試算表『總記錄』前 100 筆資料
     async function loadStudentHistory() {
       const historyList = document.getElementById('history-list');
-      historyList.innerHTML = "載入中...";
-
-      const q = query(collection(db, "orders"), where("studentEmail", "==", currentUser.email));
-      const querySnapshot = await getDocs(q);
-
-      if (querySnapshot.empty) {
-        historyList.innerHTML = "<p>目前無點餐紀錄</p>";
-        return;
-      }
-
-      let html = "";
-      querySnapshot.forEach((docSnap) => {
-        const order = docSnap.data();
-        const orderId = docSnap.id;
-        html += `
-          <div class="order-card">
-            <div class="order-info">
-              <div class="order-title">${order.foodItem} (${order.shopName || ''})</div>
-              <div>金額：$${order.price} | 座號：${order.seatNumber || '無'}</div>
-            </div>
-            <button class="btn-delete" onclick="window.deleteOrder('${orderId}', ${order.price})">刪除訂單並退款</button>
-          </div>
-        `;
-      });
-      historyList.innerHTML = html;
-    }
-
-    window.deleteOrder = async function(orderId, orderPrice) {
-      if (isPastDeadline()) {
-        return alert("❌ 已超過截止時間，訂單已送出，無法刪除退款！");
-      }
-
-      if (!confirm("確定要刪除這筆訂單嗎？款項將退回您的帳戶。")) return;
+      historyList.innerHTML = "<p style='color:#8D6E63;'>正在從試算表『總記錄』載入紀錄...</p>";
 
       try {
-        await deleteDoc(doc(db, "orders", orderId));
-        currentBalance += orderPrice;
-        document.getElementById('user-balance-display').innerText = currentBalance;
+        const url = `${GOOGLE_SHEET_WEB_APP_URL}?action=getHistory&name=${encodeURIComponent(currentUser.displayName)}&email=${encodeURIComponent(currentUser.email)}`;
+        const res = await fetch(url);
+        const data = await res.json();
 
-        alert("✅ 訂單已成功刪除！");
-        loadStudentHistory();
-      } catch (e) { alert("刪除失敗: " + e.message); }
-    };
+        if (data.status === "success") {
+          if (!data.history || data.history.length === 0) {
+            historyList.innerHTML = "<p style='color:#8D6E63;'>前 100 筆紀錄中未包含您的訂餐資料</p>";
+            return;
+          }
+
+          let tableHtml = `
+            <div class="history-table-container">
+              <table class="history-table">
+                <thead>
+                  <tr>
+                    ${data.headers ? data.headers.map(h => `<th>${h || '-'}</th>`).join('') : `
+                      <th>欄A</th><th>欄B</th><th>欄C</th><th>欄D</th><th>欄E</th><th>欄F</th><th>欄G</th><th>欄H</th><th>欄I</th>
+                    `}
+                  </tr>
+                </thead>
+                <tbody>
+          `;
+
+          data.history.forEach(item => {
+            tableHtml += '<tr>';
+            item.rowValues.forEach(val => {
+              let displayVal = val;
+              // 格式化時間 ISO 字串
+              if (typeof val === 'string' && val.includes('T') && !isNaN(Date.parse(val))) {
+                displayVal = new Date(val).toLocaleString('zh-TW');
+              }
+              tableHtml += `<td>${displayVal !== undefined && displayVal !== '' ? displayVal : '-'}</td>`;
+            });
+            tableHtml += '</tr>';
+          });
+
+          tableHtml += `
+                </tbody>
+              </table>
+            </div>
+          `;
+
+          historyList.innerHTML = tableHtml;
+        } else {
+          historyList.innerHTML = `<p style='color:#D32F2F;'>載入失敗：${data.message || '無法取得紀錄'}</p>`;
+        }
+      } catch (e) {
+        console.error("載入歷史紀錄失敗:", e);
+        historyList.innerHTML = "<p style='color:#D32F2F;'>無法讀取試算表『總記錄』，請確認 Apps Script 已更新！</p>";
+      }
+    }
 
     document.getElementById('tab-order').addEventListener('click', (e) => switchStudentTab(e, 'order-form-container'));
     document.getElementById('tab-history').addEventListener('click', (e) => {
