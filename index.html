@@ -31,12 +31,70 @@
     p { color: #8D6E63; margin-bottom: 20px; font-size: 14px; }
     .hidden { display: none !important; }
 
-    /* 按鈕與表單 */
-    .google-btn {
-      background-color: #4285F4; color: white; border: none; padding: 12px 20px;
-      border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer;
-      width: 100%; display: flex; justify-content: center; align-items: center; gap: 12px;
+    /* 登入卡片容器 */
+    .login-card {
+      max-width: 360px;
+      width: 90%;
+      padding: 32px 24px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      text-align: center;
+      box-sizing: border-box;
     }
+    .login-title {
+      margin-bottom: 24px;
+      font-size: 1.25rem;
+      color: #333333;
+    }
+    .btn-google {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 12px;
+      background-color: #ffffff;
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 500;
+      color: #3c4043;
+      cursor: pointer;
+      transition: background-color 0.2s, box-shadow 0.2s;
+    }
+    .btn-google:hover {
+      background-color: #f8f9fa;
+      box-shadow: 0 1px 3px rgba(60,64,67,0.15);
+    }
+    .google-icon {
+      width: 20px;
+      height: 20px;
+    }
+    .divider {
+      margin: 28px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .divider-line {
+      width: 100%;
+      height: 1px;
+      background-color: #e0e0e0;
+      border: none;
+    }
+    .logo-box {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .site-logo {
+      max-width: 140px;
+      height: auto;
+      object-fit: contain;
+    }
+
+    /* 表單與控制項 */
     .form-group { margin-bottom: 15px; text-align: left; }
     .form-group label { display: block; margin-bottom: 6px; color: #3E2723; font-weight: bold; font-size: 13px; }
     .form-group input, .form-group select {
@@ -92,11 +150,24 @@
 </head>
 <body>
 
-  <!-- 1. 登入卡片 -->
-  <div class="card" id="login-section">
-    <h1>TNFSH317<br>班級訂餐系統</h1>
-    <p>請使用 Google 帳號登入</p>
-    <button class="google-btn" id="login-btn">使用 Google 帳號登入</button>
+  <!-- 1. 登入區域卡片 (補上 id="login-section") -->
+  <div class="login-card" id="login-section">
+    <h2 class="login-title">歡迎登入系統</h2>
+
+    <!-- 補上 id="login-btn"，移除無效的 onclick -->
+    <button class="btn-google" id="login-btn">
+      <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="google-icon">
+      使用 Google 帳號登入
+    </button>
+
+    <div class="divider">
+      <span class="divider-line"></span>
+    </div>
+
+    <div class="logo-box">
+      <!-- ⚠️ 請記得將 YOUR_LOGO_URL.png 替換為實際的圖片檔名或連結 -->
+      <img src="login photo.png" alt="系統 Logo" class="site-logo">
+    </div>
   </div>
 
   <!-- 2. 學生點餐介面 -->
@@ -123,7 +194,6 @@
         </div>
       </div>
 
-      <!-- 動態選單：由 JavaScript 根據試算表店家名稱動態渲染 -->
       <div class="form-group">
         <label for="food-item">選擇餐點品項：</label>
         <select id="food-item" required>
@@ -189,7 +259,6 @@
         { name: "白飯", price: 0 }
       ],
       "勁請享用": [
-        // 雞肉類
         { name: "舒肥雞胸餐盒", price: 120 },
         { name: "祖傳雞腿餐盒", price: 120 },
         { name: "夏日檸檬雞餐盒", price: 125 },
@@ -197,35 +266,22 @@
         { name: "醬燒春雞餐盒", price: 130 },
         { name: "韓式辣雞餐盒", price: 130 },
         { name: "川味香麻雞餐盒", price: 130 },
-        // 魚肉類
         { name: "鮮烤鯖魚餐盒", price: 120 },
-        // 豬肉類
         { name: "泰式打拋豬餐盒", price: 115 },
         { name: "蒜醬里肌餐盒", price: 115 },
         { name: "泡菜里肌餐盒", price: 125 },
         { name: "花雕滷軟骨餐盒", price: 125 },
-        // 牛肉及蔬食類
         { name: "蔥燒雪花牛餐盒", price: 140 },
         { name: "泡菜雪花牛餐盒", price: 140 },
         { name: "照燒杏鮑菇餐盒", price: 105 },
-        // 單點品項
         { name: "單點-地瓜(4塊)", price: 15 },
         { name: "單點-全熟蛋", price: 15 },
         { name: "單點-紫米飯", price: 20 },
         { name: "單點-時令青菜", price: 35 },
-        // 冷泡茶類
-        { name: "蜜香紅茶", price: 35 },
-        { name: "高山青茶", price: 35 },
-        { name: "桂花烏龍", price: 35 },
-        { name: "玫瑰綠茶", price: 35 },
-        { name: "粉玫瑰花茶", price: 35 },
-        { name: "洋甘菊花茶", price: 35 },
-        { name: "歐薄荷葉茶", price: 35 },
-        { name: "藍莓水果茶", price: 35 }
+        
       ]
     };
 
-    // 當前有效餐點價格表
     let activePrices = {};
 
     const loginSection = document.getElementById('login-section');
@@ -239,12 +295,10 @@
         studentSection.classList.remove('hidden');
         document.getElementById('user-name-display').innerText = currentUser.displayName;
 
-        // 從總記錄讀取 J~L 欄對應的座號與餘額，以及 P3 店家
         await loadDataFromGoogleSheet(currentUser.email, currentUser.displayName);
       }).catch((error) => alert("登入失敗: " + error.message));
     });
 
-    // 從 Google 試算表讀取資料
     async function loadDataFromGoogleSheet(email, name) {
       try {
         const res = await fetch(`${GOOGLE_SHEET_WEB_APP_URL}?email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`);
@@ -261,7 +315,6 @@
           document.getElementById('current-deadline-display').innerHTML = formatDateTime(deadlineISO);
           document.getElementById('user-balance-display').innerText = currentBalance;
 
-          // 根據讀取到的店家名稱判定並動態產生選單
           renderMenuByShop(currentShop);
         } else {
           alert("讀取試算表失敗: " + data.message);
@@ -272,13 +325,11 @@
       }
     }
 
-    // 🍱 依據店家名稱動態產生下拉選單
     function renderMenuByShop(shopName) {
       const foodSelect = document.getElementById('food-item');
       foodSelect.innerHTML = '<option value="">-- 請選擇餐點 --</option>';
       activePrices = {};
 
-      // 自動比對店家名稱是否包含關鍵字
       const matchedShopKey = Object.keys(shopMenus).find(key => shopName.includes(key));
 
       if (matchedShopKey && shopMenus[matchedShopKey]) {
@@ -318,7 +369,6 @@
       return new Date() > d;
     }
 
-    // 新增訂單
     document.getElementById('submit-order-btn').addEventListener('click', async () => {
       const selectedFood = document.getElementById('food-item').value;
 
@@ -334,7 +384,6 @@
       }
 
       try {
-        // 1. 寫入 Firebase
         await addDoc(collection(db, "orders"), {
           studentEmail: currentUser.email,
           studentName: currentUser.displayName,
@@ -345,11 +394,9 @@
           orderTime: serverTimestamp()
         });
 
-        // 2. 扣除本地顯示餘額
         currentBalance -= price;
         document.getElementById('user-balance-display').innerText = currentBalance;
 
-        // 3. 🚀 發送至 Google Sheets 「網站」分頁
         fetch(GOOGLE_SHEET_WEB_APP_URL, {
           method: "POST",
           mode: "no-cors",
@@ -371,7 +418,6 @@
       }
     });
 
-    // 載入學生個人歷史紀錄
     async function loadStudentHistory() {
       const historyList = document.getElementById('history-list');
       historyList.innerHTML = "載入中...";
@@ -401,7 +447,6 @@
       historyList.innerHTML = html;
     }
 
-    // 🗑️ 刪除訂單
     window.deleteOrder = async function(orderId, orderPrice) {
       if (isPastDeadline()) {
         return alert("❌ 已超過截止時間，訂單已送出，無法刪除退款！");
