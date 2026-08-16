@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TNFSH317 班級訂餐系統</title>
   <style>
-    /* 全局背景與卡片基礎設定 */
+    /* 基礎樣式設定 */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #FCF8F2 0%, #EADDCA 50%, #C9A96E 100%);
@@ -14,118 +14,117 @@
       align-items: center;
       min-height: 100vh;
       margin: 0;
+      padding: 20px 0;
+      box-sizing: border-box;
     }
     .card {
       background-color: #FFFEFC;
-      padding: 30px;
+      padding: 25px;
       border-radius: 12px;
       box-shadow: 0 10px 30px rgba(100, 70, 30, 0.15);
       width: 100%;
-      max-width: 380px;
+      max-width: 450px;
       text-align: center;
+      box-sizing: border-box;
     }
-    h1 { color: #3E2723; font-size: 24px; margin-bottom: 10px; line-height: 1.4; letter-spacing: 1px; }
+    h1 { color: #3E2723; font-size: 22px; margin-bottom: 8px; line-height: 1.4; }
     p { color: #8D6E63; margin-bottom: 20px; font-size: 14px; }
     .hidden { display: none !important; }
 
-    /* Google 登入按鈕 */
+    /* 按鈕與表單樣式 */
     .google-btn {
       background-color: #4285F4; color: white; border: none; padding: 12px 20px;
-      border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer;
+      border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer;
       width: 100%; display: flex; justify-content: center; align-items: center; gap: 12px;
-      transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3); 
     }
-    .google-btn:hover { background-color: #357ae8; transform: translateY(-2px); }
-    .google-icon-mock { background-color: white; color: #4285F4; border-radius: 50%; width: 24px; height: 24px; display: inline-block; line-height: 24px; font-weight: 900; }
-
-    /* 表單與日曆元件 */
-    .form-group { margin-bottom: 20px; text-align: left; }
-    .form-group label { display: block; margin-bottom: 8px; color: #3E2723; font-weight: bold; font-size: 14px; }
-    .form-group select {
-      width: 100%; padding: 12px; border: 1px solid #C9A96E; border-radius: 8px;
-      box-sizing: border-box; background-color: #FCF8F2; color: #3E2723; font-size: 15px;
+    .form-group { margin-bottom: 15px; text-align: left; }
+    .form-group label { display: block; margin-bottom: 6px; color: #3E2723; font-weight: bold; font-size: 13px; }
+    .form-group input, .form-group select {
+      width: 100%; padding: 10px; border: 1px solid #C9A96E; border-radius: 6px;
+      box-sizing: border-box; background-color: #FCF8F2; color: #3E2723; font-size: 14px;
     }
-    
-    .date-slider { display: flex; overflow-x: auto; gap: 10px; padding: 5px 0 10px 0; scrollbar-width: thin; }
-    .date-slider::-webkit-scrollbar { height: 6px; }
-    .date-slider::-webkit-scrollbar-thumb { background: #C9A96E; border-radius: 10px; }
-    .date-card {
-      min-width: 60px; padding: 10px 5px; border-radius: 10px; border: 2px solid #E0E0E0;
-      background-color: #F5F5F5; color: #9E9E9E; text-align: center; cursor: not-allowed; user-select: none;
-    }
-    .date-card .day { font-size: 12px; margin-bottom: 5px; }
-    .date-card .date-num { font-size: 18px; font-weight: bold; }
-    .date-card.available { background-color: #E1F5FE; border-color: #81D4FA; color: #0288D1; cursor: pointer; }
-    .date-card.available.selected { background-color: #0288D1; border-color: #0288D1; color: white; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(2, 136, 209, 0.3); }
     .submit-btn {
-      background-color: #3E2723; color: #EADDCA; border: none; padding: 14px;
-      border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; transition: background-color 0.3s;
+      background-color: #3E2723; color: #EADDCA; border: none; padding: 12px;
+      border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; width: 100%;
     }
     .submit-btn:hover { background-color: #5D4037; }
 
-    /* ✨ 新增：頂部資訊列 (包含餘額) */
+    /* 資訊列與頁籤 */
     .header-bar {
       display: flex; justify-content: space-between; align-items: center;
-      background-color: #FCF8F2; padding: 10px 15px; border-radius: 8px;
-      margin-bottom: 20px; border: 1px solid #EADDCA;
+      background-color: #FCF8F2; padding: 10px 12px; border-radius: 8px;
+      margin-bottom: 15px; border: 1px solid #EADDCA; font-size: 14px;
     }
-    .header-name { font-weight: bold; color: #3E2723; font-size: 15px; }
-    .header-balance { font-weight: bold; color: #D32F2F; font-size: 15px; }
-
-    /* ✨ 新增：切換標籤頁 */
-    .tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid #EADDCA; }
+    .header-name { font-weight: bold; color: #3E2723; }
+    .header-balance { font-weight: bold; color: #D32F2F; }
+    .tabs { display: flex; margin-bottom: 15px; border-bottom: 2px solid #EADDCA; }
     .tab-btn {
-      flex: 1; padding: 10px; background: none; border: none; cursor: pointer;
-      font-size: 15px; font-weight: bold; color: #8D6E63; transition: 0.3s;
+      flex: 1; padding: 8px; background: none; border: none; cursor: pointer;
+      font-size: 14px; font-weight: bold; color: #8D6E63;
     }
     .tab-btn.active { color: #3E2723; border-bottom: 3px solid #C9A96E; }
 
-    /* ✨ 新增：歷史紀錄列表 */
-    .history-list { text-align: left; max-height: 250px; overflow-y: auto; padding-right: 5px; }
-    .history-item {
-      background: #FCF8F2; padding: 12px; border-radius: 8px; margin-bottom: 10px;
-      border: 1px solid #EADDCA; display: flex; justify-content: space-between; align-items: center;
+    /* 歷史訂單卡片 */
+    .order-card {
+      background-color: #FCF8F2; border: 1px solid #EADDCA; border-radius: 8px;
+      padding: 12px; margin-bottom: 10px; text-align: left; font-size: 13px;
+      display: flex; justify-content: space-between; align-items: center;
     }
-    .history-date { font-size: 12px; color: #8D6E63; margin-bottom: 4px; }
-    .history-food { font-weight: bold; color: #3E2723; font-size: 15px; }
-    .history-price { font-weight: bold; color: #D32F2F; }
-    .no-data { text-align: center; color: #8D6E63; padding: 20px 0; font-size: 14px; }
+    .order-info { color: #3E2723; }
+    .order-title { font-weight: bold; font-size: 14px; color: #3E2723; }
+    .btn-delete {
+      padding: 6px 12px; border-radius: 4px; border: none; font-size: 12px;
+      cursor: pointer; font-weight: bold; background-color: #D32F2F; color: white;
+    }
+
+    /* 管理員介面專屬樣式 */
+    .admin-card { max-width: 500px; }
+    .admin-badge {
+      background-color: #D32F2F; color: white; font-size: 12px; padding: 2px 8px;
+      border-radius: 12px; vertical-align: middle; margin-left: 5px;
+    }
+    .section-title {
+      font-weight: bold; color: #3E2723; border-left: 4px solid #C9A96E;
+      padding-left: 8px; text-align: left; margin: 20px 0 10px 0; font-size: 15px;
+    }
+    .summary-box {
+      background-color: #FCF8F2; border: 1px solid #EADDCA; border-radius: 8px;
+      padding: 12px; text-align: left; margin-bottom: 15px; font-size: 14px;
+    }
+    .summary-item { display: flex; justify-content: space-between; margin-bottom: 6px; }
+
+    /* 表格樣式 */
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+    .admin-table th, .admin-table td { padding: 8px; border-bottom: 1px solid #EADDCA; }
+    .admin-table th { background-color: #FCF8F2; color: #3E2723; }
   </style>
 </head>
 <body>
 
-  <!-- 畫面一：登入卡片 -->
+  <!-- 1. 登入卡片 -->
   <div class="card" id="login-section">
-    <h1>TNFSH317<br>班級午餐訂購系統</h1>
-    <p>請使用學校信箱 (Google 帳號) 登入以繼續</p>
-    <button class="google-btn" id="login-btn">
-      <span class="google-icon-mock">G</span> 使用 Google 帳號登入
-    </button>
+    <h1>TNFSH317<br>班級訂餐系統</h1>
+    <p>請使用 Google 帳號登入</p>
+    <button class="google-btn" id="login-btn">使用 Google 帳號登入</button>
   </div>
 
-  <!-- 畫面二：主系統 (預設隱藏) -->
-  <div class="card hidden" id="main-section">
-    
-    <!-- 頂部資訊列 (顯示姓名與餘額) -->
+  <!-- 2. 一般學生點餐介面 -->
+  <div class="card hidden" id="student-section">
     <div class="header-bar">
-      <div class="header-name" id="user-name-display">某某同學</div>
+      <div class="header-name" id="user-name-display">學生名稱</div>
       <div class="header-balance">餘額: $<span id="user-balance-display">0</span></div>
     </div>
 
-    <!-- 標籤頁切換 -->
     <div class="tabs">
       <button class="tab-btn active" id="tab-order">🍱 我要點餐</button>
-      <button class="tab-btn" id="tab-history">📜 歷史紀錄</button>
+      <button class="tab-btn" id="tab-history">📜 我的訂單管理</button>
     </div>
     
-    <!-- 區塊 A：點餐表單 -->
     <div id="order-form-container">
       <div class="form-group">
-        <label>選擇訂購日期：</label>
-        <div class="date-slider" id="date-slider"></div>
-        <input type="hidden" id="order-date" required>
+        <label>本日合作店家：<span id="current-shop-display" style="color:#D32F2F;">載入中...</span></label>
+        <label>訂餐截止時間：<span id="current-deadline-display" style="color:#D32F2F;">載入中...</span></label>
       </div>
-
       <div class="form-group">
         <label for="food-item">選擇餐點品項：</label>
         <select id="food-item" required>
@@ -135,26 +134,76 @@
           <option value="素食餐">健康素食便當 - $75</option>
         </select>
       </div>
-
       <button class="submit-btn" id="submit-order-btn">確認訂購並扣款</button>
     </div>
 
-    <!-- 區塊 B：歷史紀錄 (預設隱藏) -->
     <div id="history-container" class="hidden">
-      <div class="history-list" id="history-list">
-        <div class="no-data">載入中...</div>
+      <div id="history-list">載入中...</div>
+    </div>
+  </div>
+
+  <!-- 3. 管理員控制台介面 -->
+  <div class="card admin-card hidden" id="admin-section">
+    <h1>管理員後台 <span class="admin-badge">總務專用</span></h1>
+    <p id="admin-welcome-msg">歡迎進入管理系統</p>
+
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-admin-stats">📊 訂單統計</button>
+      <button class="tab-btn" id="tab-admin-settings">⚙️ 系統設定</button>
+      <button class="tab-btn" id="tab-admin-deposit">💰 學生儲值</button>
+    </div>
+
+    <!-- 頁籤 A：即時統計與訂單列表 -->
+    <div id="admin-stats-container">
+      <div class="section-title">餐點總計</div>
+      <div class="summary-box" id="summary-content">無訂單資料</div>
+
+      <div class="section-title">詳細訂單清單</div>
+      <div style="max-height: 200px; overflow-y: auto;">
+        <table class="admin-table">
+          <thead>
+            <tr><th>姓名</th><th>餐點</th><th>金額</th></tr>
+          </thead>
+          <tbody id="admin-order-tbody">
+            <tr><td colspan="3">載入中...</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
+    <!-- 頁籤 B：系統設定 (含日期+時間) -->
+    <div id="admin-settings-container" class="hidden">
+      <div class="form-group">
+        <label>合作店家名稱：</label>
+        <input type="text" id="setting-shop-name" placeholder="例如：正忠排骨飯">
+      </div>
+      <div class="form-group">
+        <label>訂餐截止日期與時間：</label>
+        <input type="datetime-local" id="setting-deadline-datetime">
+      </div>
+      <button class="submit-btn" id="save-settings-btn">儲存設定</button>
+    </div>
+
+    <!-- 頁籤 C：學生儲值繳費 -->
+    <div id="admin-deposit-container" class="hidden">
+      <div class="form-group">
+        <label>學生 Google Email：</label>
+        <input type="email" id="deposit-user-email" placeholder="student@tnfsh.tn.edu.tw">
+      </div>
+      <div class="form-group">
+        <label>儲值金額 ($)：</label>
+        <input type="number" id="deposit-amount" placeholder="500">
+      </div>
+      <button class="submit-btn" id="submit-deposit-btn">確認儲值入帳</button>
+    </div>
   </div>
 
   <script type="module">
-    // 💡 引入 Firebase 需要的新套件 (doc, getDoc, setDoc, updateDoc, query, where, getDocs)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc, deleteDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
-    // 🔴 請替換成你的 Firebase 金鑰
+    // 🔴 你的 Firebase 專屬金鑰
     const firebaseConfig = {
       apiKey: "AIzaSyBeeHDa90rYjlwcgLodkq6EZSfPuqjlhgA",
       authDomain: "tnfsh317-bdb2f.firebaseapp.com",
@@ -164,199 +213,265 @@
       appId: "1:423622761609:web:4fa769feb5df297d9c7a58"
     };
 
+    // 🔴 管理員 Email 名單
+    const adminEmails = [
+      "your-email@gmail.com", 
+      "brown0527@gmail.com"
+    ];
+
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
     const db = getFirestore(app);
 
-    // DOM 元素
-    const loginSection = document.getElementById('login-section');
-    const mainSection = document.getElementById('main-section');
-    const loginBtn = document.getElementById('login-btn');
-    const nameDisplay = document.getElementById('user-name-display');
-    const balanceDisplay = document.getElementById('user-balance-display');
-    
-    // 表單與紀錄元素
-    const tabOrder = document.getElementById('tab-order');
-    const tabHistory = document.getElementById('tab-history');
-    const orderFormContainer = document.getElementById('order-form-container');
-    const historyContainer = document.getElementById('history-container');
-    const historyList = document.getElementById('history-list');
-    
-    const submitOrderBtn = document.getElementById('submit-order-btn');
-    const dateSlider = document.getElementById('date-slider');
-    const hiddenDateInput = document.getElementById('order-date');
-    const foodSelect = document.getElementById('food-item');
-
     let currentUser = null;
     let currentBalance = 0;
+    const foodPrices = { "排骨飯": 80, "雞腿飯": 90, "素食餐": 75 };
 
-    // 💰 餐點價格對照表 (讓程式知道要扣多少錢)
-    const foodPrices = {
-      "排骨飯": 80,
-      "雞腿飯": 90,
-      "素食餐": 75
-    };
+    const loginSection = document.getElementById('login-section');
+    const studentSection = document.getElementById('student-section');
+    const adminSection = document.getElementById('admin-section');
+    const loginBtn = document.getElementById('login-btn');
 
-    // ==========================================
-    // 📅 產生滑動日曆 (維持原本邏輯)
-    // ==========================================
-    const availableDates = ["2026-08-17", "2026-08-18", "2026-08-19", "2026-08-20", "2026-08-21", "2026-08-24"];
-    let today = new Date();
-    const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
-    for (let i = 0; i < 14; i++) {
-      let d = new Date(); d.setDate(today.getDate() + i);
-      let dateString = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      let card = document.createElement('div'); card.className = 'date-card';
-      card.innerHTML = `<div class="day">週${weekdays[d.getDay()]}</div><div class="date-num">${d.getDate()}</div>`;
-      if (availableDates.includes(dateString)) {
-        card.classList.add('available');
-        card.addEventListener('click', () => {
-          document.querySelectorAll('.date-card').forEach(c => c.classList.remove('selected'));
-          card.classList.add('selected'); hiddenDateInput.value = dateString;
-        });
-      }
-      dateSlider.appendChild(card);
-    }
-
-    // ==========================================
-    // 👤 登入與錢包初始化系統
-    // ==========================================
     loginBtn.addEventListener('click', () => {
       signInWithPopup(auth, provider).then(async (result) => {
         currentUser = result.user;
-        nameDisplay.innerText = currentUser.displayName;
-        
-        // 【重要】查詢使用者的錢包資料
-        // 我們用同學的 email 作為資料庫裡的專屬文件 ID
-        const userRef = doc(db, "users", currentUser.email);
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
-          // 如果錢包已經存在，抓取目前的餘額
-          currentBalance = userSnap.data().balance;
-        } else {
-          // 如果是第一次登入(沒有錢包)，送他 500 元測試金並寫入資料庫
-          currentBalance = 500;
-          await setDoc(userRef, {
-            name: currentUser.displayName,
-            email: currentUser.email,
-            balance: 500
-          });
-        }
-        
-        // 更新畫面的餘額顯示
-        balanceDisplay.innerText = currentBalance;
-        
-        // 切換畫面
         loginSection.classList.add('hidden');
-        mainSection.classList.remove('hidden');
-      }).catch((error) => console.error("登入失敗", error));
+
+        if (adminEmails.includes(currentUser.email)) {
+          adminSection.classList.remove('hidden');
+          document.getElementById('admin-welcome-msg').innerText = `管理者：${currentUser.displayName}`;
+          loadAdminData();
+        } else {
+          studentSection.classList.remove('hidden');
+          document.getElementById('user-name-display').innerText = currentUser.displayName;
+          initStudentAccount();
+          loadSystemSettings();
+        }
+      }).catch((error) => alert("登入失敗: " + error.message));
     });
 
     // ==========================================
-    // 📝 訂餐與扣款邏輯
+    // 👤 學生端邏輯
     // ==========================================
-    submitOrderBtn.addEventListener('click', async () => {
-      const selectedDate = hiddenDateInput.value;
-      const selectedFood = foodSelect.value;
+    async function initStudentAccount() {
+      const userRef = doc(db, "users", currentUser.email);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        currentBalance = userSnap.data().balance;
+      } else {
+        currentBalance = 0;
+        await setDoc(userRef, { name: currentUser.displayName, email: currentUser.email, balance: 0 });
+      }
+      document.getElementById('user-balance-display').innerText = currentBalance;
+    }
 
-      if (!selectedDate || selectedFood === "") {
-        alert("請完整選擇日期和餐點喔！"); return;
+    // 格式化顯示日期時間
+    function formatDateTime(dateTimeStr) {
+      if (!dateTimeStr) return "未指定";
+      const d = new Date(dateTimeStr);
+      return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    }
+
+    async function loadSystemSettings() {
+      const sysRef = doc(db, "system", "dailyConfig");
+      const sysSnap = await getDoc(sysRef);
+      if (sysSnap.exists()) {
+        const config = sysSnap.data();
+        document.getElementById('current-shop-display').innerText = config.shopName || "未指定";
+        document.getElementById('current-deadline-display').innerText = formatDateTime(config.deadlineISO);
+      }
+    }
+
+    // ⏱️ 比對目前時間與截止日期時間
+    async function isPastDeadline() {
+      const sysRef = doc(db, "system", "dailyConfig");
+      const sysSnap = await getDoc(sysRef);
+      if (sysSnap.exists()) {
+        const deadlineISO = sysSnap.data().deadlineISO;
+        if (deadlineISO) {
+          const now = new Date();
+          const deadline = new Date(deadlineISO);
+          return now > deadline; // 如果目前時間大於截止時間，回傳 true
+        }
+      }
+      return false;
+    }
+
+    // 新增訂單
+    document.getElementById('submit-order-btn').addEventListener('click', async () => {
+      const selectedFood = document.getElementById('food-item').value;
+      if (!selectedFood) return alert("請選擇餐點！");
+
+      if (await isPastDeadline()) {
+        return alert("❌ 已超過截止日期時間，無法新增訂單！");
       }
 
       const price = foodPrices[selectedFood];
-
-      // 檢查餘額夠不夠
-      if (currentBalance < price) {
-        alert(`❌ 餘額不足！\n此餐點需要 $${price}，但你的餘額只剩 $${currentBalance}。`);
-        return;
-      }
-      
-      submitOrderBtn.innerText = "⏳ 扣款與送出中...";
-      submitOrderBtn.disabled = true;
+      if (currentBalance < price) return alert(`❌ 餘額不足 ($${currentBalance})，請找總務股長繳費！`);
 
       try {
-        // 1. 新增訂單紀錄到 "orders" 集合
         await addDoc(collection(db, "orders"), {
           studentEmail: currentUser.email,
           studentName: currentUser.displayName,
-          orderDate: selectedDate,
           foodItem: selectedFood,
           price: price,
           orderTime: serverTimestamp()
         });
 
-        // 2. 更新 (扣除) 餘額到 "users" 集合
         const newBalance = currentBalance - price;
-        const userRef = doc(db, "users", currentUser.email);
-        await updateDoc(userRef, { balance: newBalance });
-
-        // 3. 更新本地變數與畫面
+        await updateDoc(doc(db, "users", currentUser.email), { balance: newBalance });
         currentBalance = newBalance;
-        balanceDisplay.innerText = currentBalance;
-
-        alert(`✅ 訂購成功！\n已扣款 $${price}，剩餘餘額 $${currentBalance}。`);
+        document.getElementById('user-balance-display').innerText = currentBalance;
         
-      } catch (error) {
-        console.error("寫入資料庫失敗: ", error);
-        alert("發生錯誤，請稍後再試！");
-      } finally {
-        submitOrderBtn.innerText = "確認訂購並扣款";
-        submitOrderBtn.disabled = false;
+        alert("✅ 訂購成功！");
+      } catch (e) { console.error(e); }
+    });
+
+    // 載入學生個人訂單列表
+    async function loadStudentHistory() {
+      const historyList = document.getElementById('history-list');
+      historyList.innerHTML = "載入中...";
+
+      const q = query(collection(db, "orders"), where("studentEmail", "==", currentUser.email));
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        historyList.innerHTML = "<p>目前無點餐紀錄</p>";
+        return;
       }
-    });
 
-    // ==========================================
-    // 🔍 切換標籤與查詢歷史紀錄
-    // ==========================================
-    tabOrder.addEventListener('click', () => {
-      tabOrder.classList.add('active'); tabHistory.classList.remove('active');
-      orderFormContainer.classList.remove('hidden'); historyContainer.classList.add('hidden');
-    });
+      let html = "";
+      querySnapshot.forEach((docSnap) => {
+        const order = docSnap.data();
+        const orderId = docSnap.id;
+        html += `
+          <div class="order-card">
+            <div class="order-info">
+              <div class="order-title">${order.foodItem}</div>
+              <div>金額：$${order.price}</div>
+            </div>
+            <button class="btn-delete" onclick="window.deleteOrder('${orderId}', ${order.price})">刪除訂單並退款</button>
+          </div>
+        `;
+      });
+      historyList.innerHTML = html;
+    }
 
-    tabHistory.addEventListener('click', async () => {
-      tabHistory.classList.add('active'); tabOrder.classList.remove('active');
-      historyContainer.classList.remove('hidden'); orderFormContainer.classList.add('hidden');
-      
-      historyList.innerHTML = '<div class="no-data">⏳ 正在查詢你的雲端訂單...</div>';
+    // 🗑️ 刪除訂單並退款功能
+    window.deleteOrder = async function(orderId, orderPrice) {
+      if (await isPastDeadline()) {
+        return alert("❌ 已超過截止日期時間，訂單已送出給店家，無法刪除退款！");
+      }
+
+      if (!confirm("確定要刪除這筆訂單嗎？款項將會立即全額退回您的帳戶。")) return;
 
       try {
-        // 詢問資料庫：「給我所有 studentEmail 等於目前登入者的訂單」
-        const q = query(
-          collection(db, "orders"), 
-          where("studentEmail", "==", currentUser.email)
-        );
-        
-        const querySnapshot = await getDocs(q);
-        
-        if (querySnapshot.empty) {
-          historyList.innerHTML = '<div class="no-data">你還沒有任何訂餐紀錄喔！</div>';
-          return;
-        }
+        // 1. 從 Firebase 刪除該筆訂單
+        await deleteDoc(doc(db, "orders", orderId));
 
-        historyList.innerHTML = ''; // 清空載入中文字
-        
-        // 把抓到的訂單一筆一筆畫成卡片
-        querySnapshot.forEach((doc) => {
-          const order = doc.data();
-          const itemHtml = `
-            <div class="history-item">
-              <div>
-                <div class="history-date">📅 取餐日：${order.orderDate}</div>
-                <div class="history-food">${order.foodItem}</div>
-              </div>
-              <div class="history-price">-$${order.price}</div>
-            </div>
-          `;
-          historyList.innerHTML += itemHtml;
-        });
-      } catch (error) {
-        console.error("讀取歷史紀錄失敗: ", error);
-        historyList.innerHTML = '<div class="no-data">讀取失敗，請重新整理頁面。</div>';
+        // 2. 將金額退回該學生的帳戶餘額
+        const newBalance = currentBalance + orderPrice;
+        await updateDoc(doc(db, "users", currentUser.email), { balance: newBalance });
+        currentBalance = newBalance;
+        document.getElementById('user-balance-display').innerText = currentBalance;
+
+        alert("✅ 訂單已成功刪除，金額已全額退回您的帳戶！");
+        loadStudentHistory(); // 重新整理列表
+      } catch (e) { alert("刪除失敗: " + e.message); }
+    };
+
+    // 學生頁籤切換
+    document.getElementById('tab-order').addEventListener('click', (e) => {
+      switchStudentTab(e, 'order-form-container');
+    });
+    document.getElementById('tab-history').addEventListener('click', (e) => {
+      switchStudentTab(e, 'history-container');
+      loadStudentHistory();
+    });
+
+    function switchStudentTab(e, containerId) {
+      document.querySelectorAll('#student-section .tab-btn').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      document.getElementById('order-form-container').classList.add('hidden');
+      document.getElementById('history-container').classList.add('hidden');
+      document.getElementById(containerId).classList.remove('hidden');
+    }
+
+    // ==========================================
+    // 👑 管理員端邏輯
+    // ==========================================
+    async function loadAdminData() {
+      const querySnapshot = await getDocs(collection(db, "orders"));
+      let counts = {};
+      let totalMoney = 0;
+      let tbodyHtml = "";
+
+      querySnapshot.forEach((doc) => {
+        const item = doc.data();
+        counts[item.foodItem] = (counts[item.foodItem] || 0) + 1;
+        totalMoney += item.price || 0;
+        tbodyHtml += `<tr><td>${item.studentName}</td><td>${item.foodItem}</td><td>$${item.price}</td></tr>`;
+      });
+
+      let summaryHtml = "";
+      for (let food in counts) {
+        summaryHtml += `<div class="summary-item"><span>${food}</span><strong>${counts[food]} 份</strong></div>`;
+      }
+      summaryHtml += `<hr><div class="summary-item"><span>預計總金額：</span><strong style="color:#D32F2F;">$${totalMoney} 元</strong></div>`;
+
+      document.getElementById('summary-content').innerHTML = summaryHtml || "尚無訂單";
+      document.getElementById('admin-order-tbody').innerHTML = tbodyHtml || "<tr><td colspan='3'>無資料</td></tr>";
+    }
+
+    // 儲存設定 (店家與截止日期時間)
+    document.getElementById('save-settings-btn').addEventListener('click', async () => {
+      const shopName = document.getElementById('setting-shop-name').value;
+      const deadlineISO = document.getElementById('setting-deadline-datetime').value;
+
+      if (!shopName || !deadlineISO) {
+        return alert("請填寫完整的店家名稱與截止日期時間！");
+      }
+
+      await setDoc(doc(db, "system", "dailyConfig"), {
+        shopName: shopName,
+        deadlineISO: deadlineISO
+      });
+      alert("✅ 系統設定已成功更新！");
+    });
+
+    // 學生儲值
+    document.getElementById('submit-deposit-btn').addEventListener('click', async () => {
+      const email = document.getElementById('deposit-user-email').value.trim();
+      const amount = Number(document.getElementById('deposit-amount').value);
+
+      if (!email || !amount) return alert("請輸入完整 Email 與金額！");
+
+      const userRef = doc(db, "users", email);
+      const userSnap = await getDoc(userRef);
+
+      if (userSnap.exists()) {
+        const oldBalance = userSnap.data().balance || 0;
+        const newBalance = oldBalance + amount;
+        await updateDoc(userRef, { balance: newBalance });
+        alert(`✅ 儲值成功！\n學生：${email}\n加值：$${amount}\n新餘額：$${newBalance}`);
+      } else {
+        alert("⚠️ 找不到該 Email 使用者，請確認學生是否已經登入過系統。");
       }
     });
-  </script>
 
+    document.getElementById('tab-admin-stats').addEventListener('click', (e) => switchAdminTab(e, 'admin-stats-container'));
+    document.getElementById('tab-admin-settings').addEventListener('click', (e) => switchAdminTab(e, 'admin-settings-container'));
+    document.getElementById('tab-admin-deposit').addEventListener('click', (e) => switchAdminTab(e, 'admin-deposit-container'));
+
+    function switchAdminTab(e, containerId) {
+      document.querySelectorAll('#admin-section .tab-btn').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      ['admin-stats-container', 'admin-settings-container', 'admin-deposit-container'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(containerId).classList.remove('hidden');
+    }
+  </script>
 </body>
 </html>
