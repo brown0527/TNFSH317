@@ -1,0 +1,118 @@
+/* style.css - 響應式手機排版與顏色管理 */
+:root {
+    --primary: #4A90E2;
+    --bg-color: #f5f7fa;
+    --text-color: #333;
+    --warning: #e74c3c;
+    --cal-yellow: #f1c40f;
+    --cal-green: #2ecc71;
+    --cal-gray: #bdc3c7;
+}
+
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+.view {
+    display: none;
+    padding: 20px;
+    box-sizing: border-box;
+    min-height: 100vh;
+}
+
+.view.active {
+    display: block;
+}
+
+/* 登入畫面 */
+#login-view {
+    text-align: center;
+    padding-top: 20vh;
+}
+#login-view hr { margin: 30px 0; border: 0.5px solid #ccc; }
+.footer-links { margin-top: auto; padding-top: 50px; font-size: 0.9em; }
+
+/* 主頁面三大服務按鈕 */
+.menu-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+.main-btn {
+    background-color: #fff;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    padding: 20px;
+    font-size: 1.2em;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* 日曆方塊設計 */
+#calendar-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.cal-day {
+    padding: 15px 5px;
+    text-align: center;
+    border-radius: 8px;
+    font-weight: bold;
+}
+.cal-day.gray { background-color: var(--cal-gray); color: #fff; }
+.cal-day.yellow { background-color: var(--cal-yellow); color: #333; }
+.cal-day.green { background-color: var(--cal-green); color: #fff; }
+
+.hidden { display: none !important; }
+
+/* 服務說明彈出視窗樣式 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    width: 85%;
+    max-width: 400px;
+    max-height: 75vh;
+    overflow-y: auto;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.terms-body {
+    text-align: left;
+    font-size: 0.9em;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.close-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1em;
+    cursor: pointer;
+}
