@@ -1,118 +1,251 @@
-/* style.css - 響應式手機排版與顏色管理 */
+/* public/style.css - 星宇航空風格 (STARLUX Style) */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+TC:wght@300;400;600&display=swap');
+
 :root {
-    --primary: #4A90E2;
-    --bg-color: #f5f7fa;
-    --text-color: #333;
-    --warning: #e74c3c;
-    --cal-yellow: #f1c40f;
-    --cal-green: #2ecc71;
-    --cal-gray: #bdc3c7;
+    --bg-dark: #0B111E;               /* 深邃曜石藍 */
+    --card-bg: rgba(22, 30, 46, 0.75); /* 半透明星宇艙卡片 */
+    --gold-primary: #C5A059;          /* 星宇香檳金 */
+    --gold-light: #E5C483;            /* 高光金 */
+    --gold-gradient: linear-gradient(135deg, #BF953F 0%, #FCF6BA 25%, #B38728 50%, #FBF5B7 75%, #AA771C 100%);
+    --text-light: #E0E6ED;            /* 質感銀白 */
+    --text-muted: #8A99AD;           /* 沉穩灰藍 */
+    --danger: #E74C3C;
+    --cal-yellow: rgba(197, 160, 89, 0.3);
+    --cal-green: rgba(46, 204, 113, 0.3);
+    --cal-gray: rgba(255, 255, 255, 0.05);
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: var(--bg-color);
-    color: var(--text-color);
+    background: var(--bg-dark);
+    background-image: 
+        radial-gradient(circle at 50% 10%, rgba(197, 160, 89, 0.08) 0%, transparent 60%),
+        radial-gradient(circle at 80% 80%, rgba(27, 40, 64, 0.5) 0%, transparent 50%);
+    color: var(--text-light);
+    min-height: 100vh;
 }
 
 .view {
     display: none;
-    padding: 20px;
-    box-sizing: border-box;
+    padding: 24px 20px;
     min-height: 100vh;
 }
 
 .view.active {
-    display: block;
+    display: flex;
+    flex-direction: column;
 }
 
-/* 登入畫面 */
+/* ================= 登入介面 (STARLUX Cabin Login) ================= */
 #login-view {
+    justify-content: center;
+    align-items: center;
     text-align: center;
-    padding-top: 20vh;
+    background: radial-gradient(circle at center, #131C2E 0%, #0B111E 100%);
 }
-#login-view hr { margin: 30px 0; border: 0.5px solid #ccc; }
-.footer-links { margin-top: auto; padding-top: 50px; font-size: 0.9em; }
 
-/* 主頁面三大服務按鈕 */
+.brand-header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 2.8rem;
+    font-weight: 700;
+    letter-spacing: 6px;
+    background: var(--gold-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0 0 4px 0;
+    text-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+
+.brand-header .subtitle {
+    font-size: 0.75rem;
+    letter-spacing: 4px;
+    color: var(--gold-primary);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+}
+
+#login-view h2 {
+    font-weight: 300;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    color: var(--text-light);
+    margin-bottom: 20px;
+}
+
+.gold-divider {
+    width: 60px;
+    height: 1px;
+    background: var(--gold-primary);
+    margin: 20px auto 35px auto;
+    opacity: 0.6;
+}
+
+.g_id_signin {
+    margin-top: 10px;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+}
+
+.footer-links {
+    margin-top: auto;
+    padding-top: 40px;
+}
+
+.footer-links a {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: var(--gold-primary);
+    border-bottom-color: var(--gold-primary);
+}
+
+/* ================= 主頁面 (Main Executive View) ================= */
+header {
+    background: var(--card-bg);
+    border: 1px solid rgba(197, 160, 89, 0.2);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid var(--gold-primary);
+    background: radial-gradient(circle, var(--gold-light) 0%, var(--gold-primary) 100%);
+    box-shadow: 0 0 10px rgba(197, 160, 89, 0.3);
+}
+
+.details {
+    display: flex;
+    flex-direction: column;
+}
+
+#user-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--text-light);
+}
+
+#user-balance {
+    font-size: 0.85rem;
+    color: var(--gold-primary);
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+}
+
+/* 跑馬燈 */
+marquee#announcement-marquee {
+    background: rgba(197, 160, 89, 0.08);
+    border: 1px solid rgba(197, 160, 89, 0.15);
+    color: var(--gold-light);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    margin-bottom: 24px;
+}
+
+/* 三大主服務按鈕 */
 .menu-grid {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    margin-top: 20px;
-}
-.main-btn {
-    background-color: #fff;
-    border: 2px solid var(--primary);
-    color: var(--primary);
-    padding: 20px;
-    font-size: 1.2em;
-    font-weight: bold;
-    border-radius: 12px;
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    gap: 16px;
 }
 
-/* 日曆方塊設計 */
+.main-btn {
+    background: var(--card-bg);
+    border: 1px solid rgba(197, 160, 89, 0.25);
+    color: var(--text-light);
+    padding: 22px 24px;
+    font-size: 1.1rem;
+    font-weight: 400;
+    letter-spacing: 2px;
+    border-radius: 14px;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.main-btn::after {
+    content: '→';
+    color: var(--gold-primary);
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+.main-btn:active {
+    transform: scale(0.98);
+    border-color: var(--gold-primary);
+    background: rgba(197, 160, 89, 0.15);
+}
+
+#admin-btn {
+    margin-top: 20px;
+    background: transparent;
+    border: 1px dashed var(--gold-primary);
+    color: var(--gold-primary);
+    padding: 12px;
+    border-radius: 10px;
+    letter-spacing: 2px;
+}
+
+/* ================= 預訂餐點日曆 ================= */
+.back-btn {
+    background: transparent;
+    border: none;
+    color: var(--gold-primary);
+    font-size: 0.9rem;
+    padding: 0 0 16px 0;
+    cursor: pointer;
+}
+
 #calendar-container {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
+
 .cal-day {
-    padding: 15px 5px;
+    padding: 14px 4px;
     text-align: center;
-    border-radius: 8px;
-    font-weight: bold;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(5px);
 }
-.cal-day.gray { background-color: var(--cal-gray); color: #fff; }
-.cal-day.yellow { background-color: var(--cal-yellow); color: #333; }
-.cal-day.green { background-color: var(--cal-green); color: #fff; }
+
+.cal-day.gray { background: var(--cal-gray); color: var(--text-muted); }
+.cal-day.yellow { background: var(--cal-yellow); border-color: var(--gold-primary); color: var(--gold-light); }
+.cal-day.green { background: var(--cal-green); border-color: #2ecc71; color: #2ecc71; }
 
 .hidden { display: none !important; }
-
-/* 服務說明彈出視窗樣式 */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    width: 85%;
-    max-width: 400px;
-    max-height: 75vh;
-    overflow-y: auto;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-}
-
-.terms-body {
-    text-align: left;
-    font-size: 0.9em;
-    line-height: 1.6;
-    margin-bottom: 15px;
-}
-
-.close-btn {
-    width: 100%;
-    padding: 10px;
-    background-color: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 1em;
-    cursor: pointer;
-}
