@@ -1,5 +1,5 @@
 // app.js - 核心業務邏輯與 API 互動
-const API_URL = "https://script.google.com/macros/s/AKfycbynqIn5YiHNrwuhk6hNZbIq7x1mqxgKu1z-BY3WKI-n6JhlJZ3U0RfZWjjkjVtz6wI6/exec"; // 請填入 GAS 部署網址
+const API_URL = "https://script.google.com/macros/s/AKfycbynqIn5YiHNrwuhk6hNZbIq7x1mqxgKu1z-BY3WKI-n6JhlJZ3U0RfZWjjkjVtz6wI6/exec"; // 請確認此處為最新 GAS 網址
 let currentUser = null;
 
 // 切換頁面視圖
@@ -23,6 +23,9 @@ async function handleCredentialResponse(response) {
     const responsePayload = parseJwt(response.credential);
     const userEmail = responsePayload.email;
 
+    // 💡 除錯用：印出目前 Google 登入送出的 Email
+    console.log("【前端登入】實際送出的 Email:", userEmail);
+
     // 向後端驗證身分與取得資料
     try {
         const res = await fetch(API_URL, {
@@ -30,6 +33,9 @@ async function handleCredentialResponse(response) {
             body: JSON.stringify({ action: "login", email: userEmail })
         });
         const data = await res.json();
+        
+        // 💡 除錯用：印出 GAS 後端真實回傳的 JSON
+        console.log("【後端回應】GAS 回傳結果:", data);
         
         if(data.status === 'success') {
             currentUser = data.user;
@@ -48,21 +54,23 @@ async function handleCredentialResponse(response) {
             showView('main-view');
             initCalendar(); // 初始化預訂餐點的日曆
         } else {
-            alert("此信箱未註冊於系統內。");
+            alert(`此信箱 (${userEmail}) 未註冊於系統內。請確認試算表 K 欄是否有此信箱。`);
         }
     } catch (error) {
         console.error("Login Error:", error);
+        alert("網路連線失敗或 GAS 網址有誤，請開啟 F12 查看主控台。");
     }
 }
 
 // 初始化日曆 (本周與下周)
 function initCalendar() {
     const calContainer = document.getElementById('calendar-container');
+    if (!calContainer) return;
     calContainer.innerHTML = '';
-    // 建立簡易日曆邏輯 (示意用)
+    
     for(let i=0; i<10; i++) {
         let div = document.createElement('div');
-        div.className = 'cal-day yellow'; // 測試用，預設有開單
+        div.className = 'cal-day yellow'; 
         div.innerText = `10/${15+i}`;
         div.onclick = () => showMenu(`10/${15+i}`);
         calContainer.appendChild(div);
@@ -98,7 +106,7 @@ async function confirmOrder() {
         name: currentUser.name,
         item: item,
         price: parseInt(price),
-        orderDate: "2026-08-30" // 應取自選取之日期
+        orderDate: "2026-08-30" 
     };
 
     const res = await fetch(API_URL, {
@@ -144,10 +152,15 @@ async function submitTransfer() {
     }
 }
 
-// 綁定「服務說明」點擊事件
-document.getElementById('terms-link').addEventListener('click', function(e) {
-    e.preventDefault();
-    document.getElementById('terms-modal').classList.remove('hidden');
+// 綁定「服務說明」與 modal 事件
+document.addEventListener('DOMContentLoaded', () => {
+    const termsLink = document.getElementById('terms-link');
+    if(termsLink) {
+        termsLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('terms-modal').classList.remove('hidden');
+        });
+    }
 });
 
 // 關閉服務說明視窗
