@@ -19,10 +19,19 @@
         <div class="gold-divider"></div>
         
         <!-- Google 登入按鈕容器 -->
-       <div id="g_id_onload"
-     data-client_id="423622761609-lr50g2rjd7lr17n282kb5dqalokjnero.apps.googleusercontent.com"
+      <!-- 1. 設定檔 -->
+<div id="g_id_onload"
+     data-client_id="你的Client_ID.apps.googleusercontent.com"
      data-callback="handleCredentialResponse"
+     data-auto_prompt="false"
      data-use_fedcm_for_prompt="false">
+</div>
+
+<!-- 2. 實體按鈕 (使用者點擊即可登入，不受冷卻影響) -->
+<div class="g_id_signin" 
+     data-type="standard" 
+     data-size="large" 
+     data-theme="outline">
 </div>
         <div class="g_id_signin" data-type="standard" data-theme="filled_black" data-size="large" data-shape="rectangular" data-logo_alignment="left"></div>
         
