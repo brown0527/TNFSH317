@@ -95,14 +95,27 @@ function renderLogin() {
 }
 
 function handleCredentialResponse(response) {
+  console.log("credential response", response);
   const payload = parseJwt(response.credential);
+  console.log("payload", payload);
+
   APP.user = payload;
-  api("login", { email: payload.email }).then(res => {
-    if (!res.ok) return alert(res.message || "login 失敗");
-    APP.init = res;
-    APP.settingsMap = res.settingsMap || {};
-    enterHome(res);
-  }).catch(err => alert(String(err)));
+
+  api("login", { email: payload.email })
+    .then(res => {
+      console.log("login response", res);
+      if (!res.ok) {
+        alert(res.message || "login 失敗");
+        return;
+      }
+      APP.init = res;
+      APP.settingsMap = res.settingsMap || {};
+      enterHome(res);
+    })
+    .catch(err => {
+      console.error(err);
+      alert("登入後載入失敗：" + String(err));
+    });
 }
 
 function parseJwt(token) {
