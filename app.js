@@ -98,7 +98,7 @@ function handleCredentialResponse(response) {
   const payload = parseJwt(response.credential);
   APP.user = payload;
   api("login", { email: payload.email }).then(res => {
-    if (!res.ok) return alert(res.message);
+    if (!res.ok) return alert(res.message || "login 失敗");
     APP.init = res;
     APP.settingsMap = res.settingsMap || {};
     enterHome(res);
@@ -344,4 +344,48 @@ function renderSettingsEditor(settings) {
   host.innerHTML = settings.map((x) => `
     <div class="item">
       <div>日期：<input data-k="date" value="${x.date || ""}" style="width:100%;padding:8px;"></div>
-      <div>商家：<input data-k="shop"
+      <div>商家：<input data-k="shop" value="${x.shop || ""}" style="width:100%;padding:8px;margin-top:6px;"></div>
+      <div>截止：<input data-k="deadline" value="${x.deadline || ""}" style="width:100%;padding:8px;margin-top:6px;"></div>
+      <div>狀態：<select data-k="status" style="width:100%;padding:8px;margin-top:6px;">
+        <option value="" ${x.status===""?"selected":""}>未完成</option>
+        <option value="done" ${x.status==="done"?"selected":""}>已完成</option>
+      </select></div>
+      <div>顏色：<select data-k="color" style="width:100%;padding:8px;margin-top:6px;">
+        <option value="" ${x.color===""?"selected":""}>無</option>
+        <option value="yellow" ${x.color==="yellow"?"selected":""}>黃色</option>
+        <option value="green" ${x.color==="green"?"selected":""}>綠色</option>
+      </select></div>
+      <div>備註：<input data-k="note" value="${x.note || ""}" style="width:100%;padding:8px;margin-top:6px;"></div>
+    </div>
+  `).join("");
+}
+
+function addSettingRow() {
+  window._settings.push({ date:'', shop:'', deadline:'', status:'', color:'', note:'' });
+  renderSettingsEditor(window._settings);
+}
+
+function saveMarquee() {
+  api("adminSaveMarquee", {
+    email: APP.user.email,
+    marquee: document.getElementById("marqueeInput").value
+  }).then(res => alert(res.message));
+}
+
+function saveSettings() {
+  const rows = [];
+  document.querySelectorAll("#settingsEditor .item").forEach(block => {
+    rows.push({
+      date: block.querySelector('[data-k="date"]').value,
+      shop: block.querySelector('[data-k="shop"]').value,
+      deadline: block.querySelector('[data-k="deadline"]').value,
+      status: block.querySelector('[data-k="status"]').value,
+      color: block.querySelector('[data-k="color"]').value,
+      note: block.querySelector('[data-k="note"]').value
+    });
+  });
+  api("adminSaveSettings", { email: APP.user.email, settings: rows })
+    .then(res => alert(res.message));
+}
+
+window.onload = boot;
