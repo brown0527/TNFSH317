@@ -125,6 +125,11 @@ function parseJwt(token) {
 }
 
 function enterHome(res) {
+  if (!res || !res.student) {
+    alert("登入成功但沒有學生資料");
+    return;
+  }
+
   const noticeHtml = res.notice ? `<div id="noticeBox" class="notice">${res.notice}</div>` : "";
   document.getElementById("app").innerHTML = `
     <div id="homePage" class="page active">
@@ -138,15 +143,12 @@ function enterHome(res) {
           </div>
         </div>
       </div>
-
       ${noticeHtml}
-
       <div class="services">
         <div class="service-card" onclick="goOrder()">預訂餐點</div>
         <div class="service-card" onclick="goHistory()">訂餐紀錄</div>
         <div class="service-card" onclick="goAircon()">冷氣繳費</div>
       </div>
-
       <div class="service-card" onclick="goTransfer()">轉餘額</div>
       ${res.admin ? '<div class="service-card" onclick="goAdmin()">管理員面板</div>' : ''}
     </div>
