@@ -1,248 +1,350 @@
-/* public/style.css - 星宇航空風格 (啞光純金質感版) */
-
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+TC:wght@300;400;600&display=swap');
-
+/* ==========================================
+   1. 全域變數與基礎設定 (Starlux Theme)
+   ========================================== */
 :root {
-    --bg-dark: #0B111E;               /* 深邃曜石藍 */
-    --card-bg: rgba(22, 30, 46, 0.75); /* 半透明星宇艙卡片 */
-    --gold-primary: #C5A059;          /* 啞光經典純金 */
-    --text-light: #E0E6ED;            /* 質感銀白 */
-    --text-muted: #8A99AD;           /* 沉穩灰藍 */
-    --danger: #E74C3C;
-    --cal-yellow: rgba(197, 160, 89, 0.3);
-    --cal-green: rgba(46, 204, 113, 0.3);
-    --cal-gray: rgba(255, 255, 255, 0.05);
+    --bg-dark: #0b1320;             /* 機艙深夜藍底色 */
+    --card-bg: #131c2e;             /* 卡片背景藍 */
+    --card-border: rgba(197, 160, 89, 0.3); /* 淡金邊框 */
+    --gold-primary: #c5a059;        /* 星宇經典金 */
+    --gold-light: #e0c080;          /* 亮金 */
+    --gold-gradient: linear-gradient(135deg, #c5a059 0%, #9e7d3b 100%);
+    --text-primary: #f0f4f8;        /* 主文字白 */
+    --text-muted: #8a99ad;          /* 次要文字灰 */
+    --danger-red: #e74c3c;          /* 警示紅 */
+    --radius-lg: 16px;
+    --radius-md: 10px;
+    --shadow-luxury: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     -webkit-tap-highlight-color: transparent;
 }
 
 body {
-    font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
-    margin: 0;
-    padding: 0;
-    background: var(--bg-dark);
-    background-image: 
-        radial-gradient(circle at 50% 10%, rgba(197, 160, 89, 0.05) 0%, transparent 60%),
-        radial-gradient(circle at 80% 80%, rgba(27, 40, 64, 0.5) 0%, transparent 50%);
-    color: var(--text-light);
+    background-color: var(--bg-dark);
+    background-image: radial-gradient(circle at 50% 0%, #1a273e 0%, var(--bg-dark) 70%);
+    color: var(--text-primary);
     min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
 }
 
+/* ==========================================
+   2. 頁面切換機制 (View Router)
+   ========================================== */
 .view {
     display: none;
-    padding: 24px 20px;
+    width: 100%;
+    max-width: 480px; /* 限制手機與電腦版寬度 */
     min-height: 100vh;
+    padding: 24px 20px;
+    margin: 0 auto;
+    flex-direction: column;
 }
 
 .view.active {
     display: flex;
-    flex-direction: column;
 }
 
-/* ================= 登入介面 (STARLUX Cabin Login) ================= */
+.hidden {
+    display: none !important;
+}
+
+/* 通用返回按鈕 */
+.back-btn {
+    align-self: flex-start;
+    background: transparent;
+    color: var(--gold-primary);
+    border: 1px solid var(--gold-primary);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: all 0.2s;
+}
+
+.back-btn:hover {
+    background: var(--gold-primary);
+    color: #000;
+}
+
+/* ==========================================
+   3. 登入介面 (#login-view)
+   ========================================== */
 #login-view {
     justify-content: center;
     align-items: center;
     text-align: center;
-    background: radial-gradient(circle at center, #131C2E 0%, #0B111E 100%);
 }
 
 .brand-header h1 {
-    font-family: 'Cinzel', serif;
-    font-size: 2.8rem;
-    font-weight: 700;
-    letter-spacing: 6px;
-    color: var(--gold-primary); /* 純金色，無漸層光澤 */
-    margin: 0 0 4px 0;
+    font-size: 2.5rem;
+    letter-spacing: 4px;
+    background: var(--gold-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
 }
 
 .brand-header .subtitle {
-    font-size: 0.75rem;
-    letter-spacing: 4px;
-    color: var(--gold-primary);
+    font-size: 0.8rem;
+    letter-spacing: 3px;
+    color: var(--text-muted);
     text-transform: uppercase;
-    margin-bottom: 24px;
+    margin-top: 4px;
 }
 
 #login-view h2 {
-    font-weight: 300;
-    font-size: 1.1rem;
-    letter-spacing: 2px;
-    color: var(--text-light);
-    margin-bottom: 20px;
+    font-size: 1.2rem;
+    margin-top: 30px;
+    font-weight: 400;
+    color: var(--text-primary);
 }
 
 .gold-divider {
     width: 60px;
-    height: 1px;
-    background: var(--gold-primary);
-    margin: 20px auto 35px auto;
-    opacity: 0.6;
+    height: 2px;
+    background: var(--gold-gradient);
+    margin: 15px auto 30px auto;
 }
 
 .g_id_signin {
-    margin-top: 10px;
-    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
 }
 
-/* 服務說明往上移，緊跟在 Google 登入按鈕下方 */
 .footer-links {
-    margin-top: 25px; /* 取消原本置底的 auto，改為緊貼按鈕下方 */
-    padding-top: 0;
+    margin-top: 40px;
 }
 
 .footer-links a {
     color: var(--text-muted);
     font-size: 0.85rem;
-    letter-spacing: 1px;
     text-decoration: none;
-    border-bottom: 1px solid rgba(197, 160, 89, 0.3);
+    border-bottom: 1px dashed var(--text-muted);
     padding-bottom: 2px;
-    transition: all 0.3s ease;
 }
 
-.footer-links a:hover {
-    color: var(--gold-primary);
-    border-bottom-color: var(--gold-primary);
-}
-
-/* ================= 主頁面 (Main Executive View) ================= */
+/* ==========================================
+   4. 主頁面頂部資訊與選單 (#main-view)
+   ========================================== */
 header {
-    background: var(--card-bg);
-    border: 1px solid rgba(197, 160, 89, 0.2);
-    backdrop-filter: blur(12px);
-    border-radius: 16px;
-    padding: 16px 20px;
-    margin-bottom: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    margin-bottom: 20px;
 }
 
 .user-info {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-lg);
+    padding: 16px 20px;
     display: flex;
     align-items: center;
     gap: 16px;
+    box-shadow: var(--shadow-luxury);
 }
 
-.avatar {
-    width: 48px;
-    height: 48px;
+.user-info .avatar {
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    border: 1px solid var(--gold-primary);
-    background: var(--gold-primary);
-    box-shadow: 0 0 10px rgba(197, 160, 89, 0.2);
+    border: 2px solid var(--gold-primary);
+    background-size: cover;
+    background-position: center;
+    background-color: #1a273e;
 }
 
-.details {
+.user-info .details {
     display: flex;
     flex-direction: column;
 }
 
 #user-name {
     font-size: 1.1rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    color: var(--text-light);
+    font-weight: bold;
+    color: var(--text-primary);
 }
 
 #user-balance {
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     color: var(--gold-primary);
-    letter-spacing: 0.5px;
-    margin-top: 2px;
+    margin-top: 4px;
 }
 
-/* 跑馬燈 */
-marquee#announcement-marquee {
-    background: rgba(197, 160, 89, 0.08);
-    border: 1px solid rgba(197, 160, 89, 0.15);
-    color: var(--gold-primary);
-    border-radius: 8px;
+marquee {
+    background: rgba(197, 160, 89, 0.1);
+    border: 1px solid var(--card-border);
+    color: var(--gold-light);
     padding: 8px 12px;
+    border-radius: 8px;
     font-size: 0.85rem;
-    letter-spacing: 1px;
-    margin-bottom: 24px;
+    margin-bottom: 25px;
 }
 
-/* 三大主服務按鈕 */
+/* 功能選單網格 */
 .menu-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
 }
 
+/* 按鈕風格 */
 .main-btn {
     background: var(--card-bg);
-    border: 1px solid rgba(197, 160, 89, 0.25);
-    color: var(--text-light);
-    padding: 22px 24px;
-    font-size: 1.1rem;
-    font-weight: 400;
-    letter-spacing: 2px;
-    border-radius: 14px;
+    border: 1px solid var(--card-border);
+    color: var(--text-primary);
+    padding: 20px 10px;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
-    text-align: left;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
-.main-btn::after {
-    content: '→';
-    color: var(--gold-primary);
-    font-size: 1.2rem;
-    transition: transform 0.3s ease;
-}
-
-.main-btn:active {
-    transform: scale(0.98);
+.menu-grid .main-btn:hover {
     border-color: var(--gold-primary);
-    background: rgba(197, 160, 89, 0.15);
+    background: linear-gradient(145deg, #18253d, #111828);
+    transform: translateY(-2px);
 }
 
+/* 管理員按鈕專屬樣式 */
 #admin-btn {
-    margin-top: 20px;
+    width: 100%;
+    padding: 15px;
     background: transparent;
-    border: 1px dashed var(--gold-primary);
-    color: var(--gold-primary);
-    padding: 12px;
-    border-radius: 10px;
-    letter-spacing: 2px;
-}
-
-/* ================= 預訂餐點日曆 ================= */
-.back-btn {
-    background: transparent;
-    border: none;
-    color: var(--gold-primary);
-    font-size: 0.9rem;
-    padding: 0 0 16px 0;
+    border: 1px solid var(--danger-red);
+    color: var(--danger-red);
+    border-radius: var(--radius-md);
+    font-weight: bold;
     cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.2s;
 }
 
-#calendar-container {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-    margin-bottom: 24px;
+#admin-btn:hover {
+    background: var(--danger-red);
+    color: #fff;
 }
 
-.cal-day {
-    padding: 14px 4px;
+/* ==========================================
+   5. 輸入表單與選單介面 (Order / Transfer)
+   ========================================== */
+#transfer-view select,
+#transfer-view input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 16px;
+    border-radius: var(--radius-md);
+    background: var(--card-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--card-border);
+    font-size: 0.95rem;
+    outline: none;
+}
+
+#transfer-view select:focus,
+#transfer-view input:focus {
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 8px rgba(197, 160, 89, 0.4);
+}
+
+#transfer-view .main-btn,
+#confirm-order-btn {
+    width: 100%;
+    background: var(--gold-gradient);
+    border: none;
+    color: #fff;
+    padding: 14px;
+    font-size: 1rem;
+}
+
+/* ==========================================
+   6. 服務說明與條款 Modal 彈出視窗
+   ========================================== */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.modal.hidden {
+    display: none !important;
+}
+
+.modal-content {
+    background: var(--card-bg);
+    border: 1px solid var(--gold-primary);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    width: 100%;
+    max-width: 440px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-luxury);
+}
+
+.modal-content h2 {
+    font-size: 1.2rem;
+    color: var(--gold-light);
     text-align: center;
-    border-radius: 10px;
-    font-size: 0.85rem;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(5px);
+    margin-bottom: 12px;
 }
 
-.cal-day.gray { background: var(--cal-gray); color: var(--text-muted); }
-.cal-day.yellow { background: var(--cal-yellow); border-color: var(--gold-primary); color: var(--gold-primary); }
-.cal-day.green { background: var(--cal-green); border-color: #2ecc71; color: #2ecc71; }
+.modal-content hr {
+    border: none;
+    height: 1px;
+    background: var(--card-border);
+    margin-bottom: 15px;
+}
 
-.hidden { display: none !important; }
+.terms-body {
+    overflow-y: auto;
+    flex: 1;
+    padding-right: 6px;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: #d1d5db;
+}
+
+.terms-body p {
+    margin-bottom: 14px;
+}
+
+.terms-body strong {
+    color: var(--gold-primary);
+}
+
+.close-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--gold-gradient);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: opacity 0.2s;
+}
+
+.close-btn:hover {
+    opacity: 0.9;
+}
