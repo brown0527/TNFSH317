@@ -55,27 +55,21 @@ const MENU_DATA = {
   ]
 };
 
-const APP = {
-  user: null,
-  init: null,
-  settingsMap: {},
-  menus: MENU_DATA,
-  currentOrderDate: null
-};
+const APP = { user: null, init: null, settingsMap: {}, menus: MENU_DATA, currentOrderDate: null };
 
 function api(action, payload = {}) {
   return fetch(API_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
     body: JSON.stringify({ action, ...payload })
-  }).then(r => r.json());
+  }).then(async r => {
+    const text = await r.text();
+    try { return JSON.parse(text); } catch (e) { return { ok: false, message: text }; }
+  });
 }
 
 function boot() {
-  google.accounts.id.initialize({
-    client_id: CLIENT_ID,
-    callback: handleCredentialResponse
-  });
+  google.accounts.id.initialize({ client_id: CLIENT_ID, callback: handleCredentialResponse });
   renderLogin();
   api("getMarquee", {}).then(res => {
     if (res.ok) document.getElementById("marqueeText").textContent = res.data;
@@ -95,25 +89,20 @@ function renderLogin() {
       </div>
     </div>
   `;
-
   google.accounts.id.renderButton(document.getElementById("googleBtn"), {
-    theme: "outline",
-    size: "large",
-    width: 300,
-    text: "signin_with"
+    theme: "outline", size: "large", width: 300, text: "signin_with"
   });
 }
 
 function handleCredentialResponse(response) {
   const payload = parseJwt(response.credential);
   APP.user = payload;
-
   api("login", { email: payload.email }).then(res => {
     if (!res.ok) return alert(res.message);
     APP.init = res;
     APP.settingsMap = res.settingsMap || {};
     enterHome(res);
-  });
+  }).catch(err => alert(String(err)));
 }
 
 function parseJwt(token) {
@@ -148,16 +137,13 @@ function enterHome(res) {
       <div class="service-card" onclick="goTransfer()">轉餘額</div>
       ${res.admin ? '<div class="service-card" onclick="goAdmin()">管理員面板</div>' : ''}
     </div>
-
     <div id="pageHost"></div>
   `;
   document.getElementById("marqueeText").textContent = res.marquee || "歡迎使用 TNFSH317 訂餐系統";
   if (res.notice) alert(res.notice);
 }
 
-function backHome() {
-  document.getElementById("pageHost").innerHTML = "";
-}
+function backHome() { document.getElementById("pageHost").innerHTML = ""; }
 
 function pageShell(title, inner) {
   document.getElementById("pageHost").innerHTML = `
@@ -176,10 +162,7 @@ function openTerms() {
 }
 
 function goOrder() {
-  pageShell("預訂餐點", `
-    <div id="calendarGrid" class="grid"></div>
-    <div id="orderPanel"></div>
-  `);
+  pageShell("預訂餐點", `<div id="calendarGrid" class="grid"></div><div id="orderPanel"></div>`);
   renderCalendar();
 }
 
@@ -187,20 +170,16 @@ function renderCalendar() {
   const grid = document.getElementById("calendarGrid");
   grid.innerHTML = "";
   const today = new Date();
-
   for (let i = 0; i < 14; i++) {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
     const iso = d.toISOString().slice(0, 10);
     const setting = APP.settingsMap[iso];
-
     const div = document.createElement("div");
     div.className = "day";
-
     if (setting && setting.status === "done") div.classList.add("green");
     else if (setting) div.classList.add("yellow");
     else div.classList.add("gray");
-
     div.innerHTML = `<div class="date">${d.getDate()}</div><div>${iso}</div>`;
     div.onclick = () => openOrderDate(iso);
     grid.appendChild(div);
@@ -264,7 +243,7 @@ function submitOrder() {
     orderDate: APP.currentOrderDate,
     deadline: setting.deadline || "",
     note: ""
-  }).then(res => alert(res.message));
+  }).then(res => alert(res.message)).catch(err => alert(String(err)));
 }
 
 function goHistory() {
@@ -324,13 +303,8 @@ function confirmTransfer() {
   const amount = Number(document.getElementById("transferAmount").value);
   if (!amount || amount <= 0 || amount > 300) return alert("金額錯誤");
   if (!confirm(`確認轉餘額給 ${seatNo} ${name}\n金額：${amount}`)) return;
-
-  api("submitTransfer", {
-    email: APP.user.email,
-    toSeatNo: seatNo,
-    toName: name,
-    amount
-  }).then(res => alert(res.message));
+  api("submitTransfer", { email: APP.user.email, toSeatNo: seatNo, toName: name, amount })
+    .then(res => alert(res.message));
 }
 
 function goAdmin() {
@@ -340,21 +314,18 @@ function goAdmin() {
     const settings = (res.settings || []).slice(1).map(r => ({
       date: r[0], shop: r[1], deadline: r[2], status: r[3], color: r[4], note: r[5]
     }));
-
     document.getElementById("adminArea").innerHTML = `
       <div class="item">
         <h3>跑馬燈</h3>
         <input id="marqueeInput" value="${res.marquee || ""}" style="width:100%;padding:10px;">
         <button onclick="saveMarquee()">儲存跑馬燈</button>
       </div>
-
       <div class="item">
         <h3>訂餐設定</h3>
         <div id="settingsEditor"></div>
         <button onclick="addSettingRow()">新增日期設定</button>
         <button onclick="saveSettings()">儲存設定</button>
       </div>
-
       <div class="item">
         <h3>各日統計表</h3>
         <table>
@@ -370,54 +341,7 @@ function goAdmin() {
 
 function renderSettingsEditor(settings) {
   const host = document.getElementById("settingsEditor");
-  host.innerHTML = settings.map((x, i) => `
+  host.innerHTML = settings.map((x) => `
     <div class="item">
       <div>日期：<input data-k="date" value="${x.date || ""}" style="width:100%;padding:8px;"></div>
-      <div>商家：<input data-k="shop" value="${x.shop || ""}" style="width:100%;padding:8px;margin-top:6px;"></div>
-      <div>截止：<input data-k="deadline" value="${x.deadline || ""}" style="width:100%;padding:8px;margin-top:6px;"></div>
-      <div>狀態：<select data-k="status" style="width:100%;padding:8px;margin-top:6px;">
-        <option value="" ${x.status===""?"selected":""}>未完成</option>
-        <option value="done" ${x.status==="done"?"selected":""}>已完成</option>
-      </select></div>
-      <div>顏色：<select data-k="color" style="width:100%;padding:8px;margin-top:6px;">
-        <option value="" ${x.color===""?"selected":""}>無</option>
-        <option value="yellow" ${x.color==="yellow"?"selected":""}>黃色</option>
-        <option value="green" ${x.color==="green"?"selected":""}>綠色</option>
-      </select></div>
-      <div>備註：<input data-k="note" value="${x.note || ""}" style="width:100%;padding:8px;margin-top:6px;"></div>
-    </div>
-  `).join("");
-}
-
-function addSettingRow() {
-  window._settings.push({ date:'', shop:'', deadline:'', status:'', color:'', note:'' });
-  renderSettingsEditor(window._settings);
-}
-
-function saveMarquee() {
-  api("adminSaveMarquee", {
-    email: APP.user.email,
-    marquee: document.getElementById("marqueeInput").value
-  }).then(res => alert(res.message));
-}
-
-function saveSettings() {
-  const rows = [];
-  document.querySelectorAll("#settingsEditor .item").forEach(block => {
-    rows.push({
-      date: block.querySelector('[data-k="date"]').value,
-      shop: block.querySelector('[data-k="shop"]').value,
-      deadline: block.querySelector('[data-k="deadline"]').value,
-      status: block.querySelector('[data-k="status"]').value,
-      color: block.querySelector('[data-k="color"]').value,
-      note: block.querySelector('[data-k="note"]').value
-    });
-  });
-
-  api("adminSaveSettings", {
-    email: APP.user.email,
-    settings: rows
-  }).then(res => alert(res.message));
-}
-
-window.onload = boot;
+      <div>商家：<input data-k="shop"
