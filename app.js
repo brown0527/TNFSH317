@@ -1,5 +1,5 @@
 // app.js - 核心業務邏輯與 API 互動
-const API_URL = "https://script.google.com/macros/s/AKfycbynqIn5YiHNrwuhk6hNZbIq7x1mqxgKu1z-BY3WKI-n6JhlJZ3U0RfZWjjkjVtz6wI6/exec"; // 請確認此處為最新 GAS 網址
+const API_URL = "https://script.google.com/macros/s/AKfycbwlngizlKpaUf8wCYzHpdTrxsL4cnPG_-X8kXMSW11_qHcdAUgrafzHr6SXdeG46-sk/exec"; // 請確認此處為最新 GAS 網址
 let currentUser = null;
 
 // 切換頁面視圖
